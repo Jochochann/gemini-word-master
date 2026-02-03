@@ -43,7 +43,7 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
     try {
       let fullResponse = '';
       const stream = streamAssistantResponse(
-        currentWord.word, 
+        currentWord.word,
         currentWord.translation,
         finalInput
       );
@@ -63,7 +63,7 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
       console.error(e);
       let errorMessage = 'エラーが発生しました。';
       const isAuthError = e.message?.includes('leaked') || e.message?.includes('403') || e.message?.includes('PERMISSION_DENIED');
-      
+
       if (isAuthError) {
         errorMessage = 'APIキーが無効、または漏洩の可能性があります。新しいキーを選択してください。';
         setNeedsApiKey(true);
@@ -71,7 +71,7 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
         errorMessage = 'APIキーまたはプロジェクトが見つかりません。';
         setNeedsApiKey(true);
       }
-      
+
       setError(errorMessage);
       setMessages(prev => {
         if (prev.length > 0 && prev[prev.length - 1].role === 'model' && !prev[prev.length - 1].text) {
@@ -93,78 +93,77 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
 
   return (
     <div className="flex flex-col h-full bg-white border-l border-slate-200">
-      <div className="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Sparkles className="text-blue-500" size={20} />
-          <h3 className="font-bold text-slate-700">Gemini 講師</h3>
+      <div className="p-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+        <div className="flex items-center space-x-2.5">
+          <Sparkles className="text-blue-500" size={22} />
+          <h3 className="font-bold text-lg text-slate-800 tracking-tight">Gemini 講師</h3>
         </div>
-        {error && <AlertCircle className="text-red-500" size={16} />}
+        {error && <AlertCircle className="text-red-500" size={18} />}
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-5 custom-scrollbar">
         {messages.length === 0 && (
-          <div className="text-center py-12">
-            <Bot className="mx-auto text-slate-200 mb-4" size={64} />
-            <p className="text-slate-500 text-sm">
-              <span className="font-bold text-blue-600">{currentWord.word}</span> について何でも聞いてください。
+          <div className="text-center py-16">
+            <Bot className="mx-auto text-slate-200 mb-5" size={72} />
+            <p className="text-slate-500 text-base leading-relaxed">
+              <span className="font-bold text-blue-600 text-lg block mb-1">{currentWord.word}</span> について何でも聞いてください。
             </p>
           </div>
         )}
 
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[90%] rounded-2xl p-3 text-sm flex space-x-2 ${
-              msg.role === 'user' 
-                ? 'bg-blue-600 text-white shadow-md' 
+            <div className={`max-w-[92%] rounded-2xl p-4 text-base flex space-x-3 ${msg.role === 'user'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
                 : 'bg-slate-100 text-slate-800 border border-slate-200 shadow-sm'
-            }`}>
+              }`}>
               <div className="mt-1 flex-shrink-0">
-                {msg.role === 'user' ? <User size={14} /> : <Bot size={14} className="text-blue-500" />}
+                {msg.role === 'user' ? <User size={16} /> : <Bot size={16} className="text-blue-500" />}
               </div>
               <div className="whitespace-pre-wrap leading-relaxed">
-                {msg.text || (msg.role === 'model' && isTyping && i === messages.length - 1 ? <Loader2 size={14} className="animate-spin inline" /> : '')}
+                {msg.text || (msg.role === 'model' && isTyping && i === messages.length - 1 ? <Loader2 size={16} className="animate-spin inline" /> : '')}
               </div>
             </div>
           </div>
         ))}
 
         {error && (
-          <div className="p-4 bg-red-50 border border-red-100 rounded-2xl space-y-3">
-            <div className="text-red-600 text-xs flex items-start space-x-2 font-medium">
-              <AlertCircle size={14} className="mt-0.5 flex-shrink-0" />
+          <div className="p-5 bg-red-50 border border-red-100 rounded-2xl space-y-4">
+            <div className="text-red-600 text-sm flex items-start space-x-2.5 font-bold">
+              <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
               <span>{error}</span>
             </div>
             {needsApiKey && (
-              <button 
+              <button
                 onClick={handleOpenApiKey}
-                className="w-full flex items-center justify-center space-x-2 py-2.5 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 shadow-lg active:scale-95 transition-all"
+                className="w-full flex items-center justify-center space-x-2 py-3 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 shadow-lg active:scale-95 transition-all"
               >
-                <Key size={14} />
+                <Key size={16} />
                 <span>新しいAPIキーを選択</span>
               </button>
             )}
           </div>
         )}
 
-        {isTyping && messages[messages.length-1]?.role === 'user' && (
+        {isTyping && messages[messages.length - 1]?.role === 'user' && (
           <div className="flex justify-start">
-            <div className="bg-slate-100 rounded-2xl p-3 text-sm flex items-center space-x-2">
-              <Loader2 size={14} className="animate-spin text-blue-500" />
-              <span className="text-slate-500 italic">Gemini が回答を作成中...</span>
+            <div className="bg-slate-50 rounded-2xl p-4 text-base flex items-center space-x-3 border border-slate-100">
+              <Loader2 size={18} className="animate-spin text-blue-500" />
+              <span className="text-slate-500 italic font-medium">Gemini が回答を作成中...</span>
             </div>
           </div>
         )}
       </div>
 
       {/* Persistent Quick Questions Area */}
-      <div className="px-4 py-3 bg-slate-50/50 border-t border-slate-100">
-        <div className="flex flex-wrap gap-2">
+      <div className="px-5 py-4 bg-slate-50/50 border-t border-slate-100">
+        <div className="flex flex-wrap gap-2.5">
           {quickQuestions.map(q => (
             <button
               key={q}
               onClick={() => handleSend(q)}
               disabled={isTyping}
-              className="text-[10px] font-bold px-2.5 py-1.5 bg-white hover:bg-blue-50 text-slate-500 hover:text-blue-600 rounded-lg border border-slate-200 transition-all shadow-sm active:scale-95 disabled:opacity-50"
+              className="text-xs font-bold px-3 py-2 bg-white hover:bg-blue-600 text-slate-600 hover:text-white rounded-xl border border-slate-200 hover:border-blue-600 transition-all shadow-sm active:scale-95 disabled:opacity-50"
             >
               {q}
             </button>
@@ -172,7 +171,7 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
         </div>
       </div>
 
-      <div className="p-4 pt-2 border-t border-slate-100">
+      <div className="p-5 pt-3 border-t border-slate-100">
         <div className="relative">
           <textarea
             rows={2}
@@ -185,16 +184,15 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
               }
             }}
             placeholder="質問を入力..."
-            className="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 resize-none text-sm transition-all outline-none"
+            className="w-full pl-5 pr-14 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 resize-none text-base transition-all outline-none"
           />
           <button
             onClick={() => handleSend()}
             disabled={!input.trim() || isTyping}
-            className={`absolute right-2 bottom-2 p-2 rounded-xl transition-all active:scale-90 ${
-              input.trim() && !isTyping ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'
-            }`}
+            className={`absolute right-3 bottom-3 p-2.5 rounded-xl transition-all active:scale-90 ${input.trim() && !isTyping ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-300'
+              }`}
           >
-            <Send size={20} />
+            <Send size={24} />
           </button>
         </div>
       </div>
