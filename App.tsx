@@ -29,7 +29,7 @@ const DEFAULT_SHEET_ID = '1Ul94nfm4HbnoIeUyElhBXC6gPOsbbU-nsDjkzoY_gPU';
 const DEFAULT_SHEETS: SheetConfig[] = [
   { name: 'GoFluent', gid: '420352437', lang: 'en-US' },
   { name: 'Atsueigo', gid: '0', lang: 'en-US' },
-  { name: '台湾華語', gid: '0', lang: 'zh-TW' }
+  { name: '台湾華語', gid: '1574869365', lang: 'zh-TW' }
 ];
 
 const App: React.FC = () => {
