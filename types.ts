@@ -30,3 +30,17 @@ export interface AppState {
   isSettingsOpen: boolean;
   viewMode: ViewMode;
 }
+
+// Define AIStudio interface to match the environment's expected type
+export interface AIStudio {
+  hasSelectedApiKey: () => Promise<boolean>;
+  openSelectKey: () => Promise<void>;
+}
+
+// AI Studioのグローバルプロパティを型定義
+declare global {
+  interface Window {
+    // Fixed: Use the named AIStudio interface instead of an inline type to resolve type conflict
+    aistudio?: AIStudio;
+  }
+}
