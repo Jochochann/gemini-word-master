@@ -31,16 +31,16 @@ export interface AppState {
   viewMode: ViewMode;
 }
 
-// Define AIStudio interface to match the environment's expected type
-export interface AIStudio {
-  hasSelectedApiKey: () => Promise<boolean>;
-  openSelectKey: () => Promise<void>;
-}
-
 // AI Studioのグローバルプロパティを型定義
 declare global {
+  // Fix: Move the AIStudio interface inside declare global to prevent namespace conflicts 
+  // between exported module types and global types, which causes "type is AIStudio but must be AIStudio" errors.
+  interface AIStudio {
+    hasSelectedApiKey: () => Promise<boolean>;
+    openSelectKey: () => Promise<void>;
+  }
+
   interface Window {
-    // Fixed: Use the named AIStudio interface instead of an inline type to resolve type conflict
     aistudio?: AIStudio;
   }
 }

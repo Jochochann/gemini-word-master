@@ -290,8 +290,8 @@ const App: React.FC = () => {
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col relative min-w-0">
-        <header className="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-30">
+      <main className="flex-1 flex flex-col relative min-w-0 h-full overflow-hidden">
+        <header className="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-30 flex-shrink-0">
           <div className="flex items-center space-x-3">
             <button onClick={() => setIsSidebarOpen(true)} className={`p-2 text-slate-500 hover:bg-slate-100 rounded-lg lg:hidden ${isSidebarOpen ? 'invisible' : 'visible'}`}><Menu size={20} /></button>
 
@@ -343,9 +343,9 @@ const App: React.FC = () => {
         </header>
 
         <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative">
-          <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/50 overflow-y-auto p-4 sm:p-8 pb-32 lg:pb-8">
+          <div className="flex-1 flex flex-col items-center justify-start lg:justify-center bg-slate-50/50 overflow-y-auto p-4 sm:p-8 pt-6 sm:pt-8 pb-32 lg:pb-8">
             {state.isLoading ? (
-              <div className="text-center animate-pulse">
+              <div className="text-center animate-pulse py-20">
                 <Loader2 className="mx-auto text-blue-500 animate-spin mb-4" size={48} />
                 <p className="text-slate-600 font-bold uppercase tracking-widest text-sm">Loading Data...</p>
               </div>
