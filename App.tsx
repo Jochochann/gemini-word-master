@@ -1,13 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { AppState, WordItem, ViewMode } from './types.ts';
+import { AppState, WordItem, ViewMode, SheetConfig } from './types.ts';
 import WordCard from './components/WordCard.tsx';
 import WordList from './components/WordList.tsx';
 import GeminiAssistant from './components/GeminiAssistant.tsx';
 import { 
   Database, 
   Settings, 
-  ExternalLink, 
   Loader2, 
   BookOpen, 
   Menu, 
@@ -15,11 +14,23 @@ import {
   Plus,
   Layers,
   LayoutGrid,
-  CreditCard
+  CreditCard,
+  MessageSquare,
+  Trash2,
+  ChevronDown,
+  Hash,
+  Languages,
+  Copy,
+  ClipboardCheck,
+  FileJson,
+  Upload
 } from 'lucide-react';
 
 const DEFAULT_SHEET_ID = '1Ul94nfm4HbnoIeUyElhBXC6gPOsbbU-nsDjkzoY_gPU';
-const DEFAULT_GIDS = '420352437'; // Can be comma-separated like "0, 420352437"
+const DEFAULT_SHEETS: SheetConfig[] = [
+  { name: 'English Basic', gid: '420352437', lang: 'en-US' },
+  { name: 'Business English', gid: '0', lang: 'en-US' }
+];
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>({
@@ -27,86 +38,91 @@ const App: React.FC = () => {
     currentIndex: 0,
     isLoading: true,
     spreadsheetId: '',
+    sheets: [],
+    currentSheetGid: '',
     isSettingsOpen: false,
     viewMode: 'card'
   });
 
   const [inputUrl, setInputUrl] = useState('');
-  const [inputGids, setInputGids] = useState('');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [newSheetName, setNewSheetName] = useState('');
+  const [newSheetGid, setNewSheetGid] = useState('');
+  const [newSheetLang, setNewSheetLang] = useState('en-US');
+  const [tempSheets, setTempSheets] = useState<SheetConfig[]>([]);
+  
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isAssistantOpenMobile, setIsAssistantOpenMobile] = useState(false);
+  const [isSheetSelectorOpen, setIsSheetSelectorOpen] = useState(false);
+  
+  const [jsonInput, setJsonInput] = useState('');
+  const [copyFeedback, setCopyFeedback] = useState(false);
 
-  // Initialize and auto-fetch
   useEffect(() => {
-    const savedId = localStorage.getItem('gemini_word_master_sheet_id');
-    const savedGids = localStorage.getItem('gemini_word_master_sheet_gids');
-    
-    const targetId = savedId || DEFAULT_SHEET_ID;
-    const targetGids = savedGids || DEFAULT_GIDS;
-    
-    setInputUrl(`https://docs.google.com/spreadsheets/d/${targetId}/edit`);
-    setInputGids(targetGids);
-    
-    fetchMultipleSheets(targetId, targetGids);
-  }, []);
-
-  const fetchSingleSheet = async (id: string, gid: string): Promise<Omit<WordItem, 'id'>[]> => {
-    let url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv`;
-    if (gid && gid !== '0') {
-      url += `&gid=${gid}`;
+    if (window.innerWidth >= 1024) {
+      setIsSidebarOpen(true);
     }
 
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`Failed to fetch sheet ${gid}`);
-    const csvText = await response.text();
+    const savedId = localStorage.getItem('gemini_word_master_sheet_id');
+    const savedSheets = localStorage.getItem('gemini_word_master_sheets');
     
-    const lines = csvText.split('\n');
-    return lines.slice(1).map((line) => {
-      const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
-      return {
-        word: parts[1] || '',
-        translation: parts[2] || '',
-        example: parts[3] || '',
-        notes: parts[4] || ''
-      };
-    }).filter(w => w.word !== '');
-  };
+    const targetId = savedId || DEFAULT_SHEET_ID;
+    const targetSheets: SheetConfig[] = savedSheets ? JSON.parse(savedSheets) : DEFAULT_SHEETS;
+    
+    const sanitizedSheets = targetSheets.map(s => ({ ...s, lang: s.lang || 'en-US' }));
+    
+    setInputUrl(`https://docs.google.com/spreadsheets/d/${targetId}/edit`);
+    setTempSheets(sanitizedSheets);
+    
+    setState(prev => ({ 
+      ...prev, 
+      spreadsheetId: targetId, 
+      sheets: sanitizedSheets,
+      currentSheetGid: sanitizedSheets[0]?.gid || '0'
+    }));
 
-  const fetchMultipleSheets = async (id: string, gidsString: string) => {
+    fetchSheetData(targetId, sanitizedSheets[0]?.gid || '0');
+  }, []);
+
+  const fetchSheetData = async (id: string, gid: string) => {
     if (!id) return;
-    setState(prev => ({ ...prev, isLoading: true }));
+    setState(prev => ({ ...prev, isLoading: true, currentSheetGid: gid }));
     
     try {
-      const gidList = gidsString.split(',').map(g => g.trim()).filter(g => g !== '');
-      if (gidList.length === 0) gidList.push('0');
-
-      const results = await Promise.all(gidList.map(gid => fetchSingleSheet(id, gid)));
-      
-      const mergedWords: WordItem[] = results.flat().map((w, idx) => ({
-        ...w,
-        id: (idx + 1).toString()
-      }));
-
-      if (mergedWords.length > 0) {
-        setState(prev => ({ 
-          ...prev, 
-          words: mergedWords, 
-          spreadsheetId: id,
-          currentIndex: 0,
-          isLoading: false
-        }));
-        localStorage.setItem('gemini_word_master_sheet_id', id);
-        localStorage.setItem('gemini_word_master_sheet_gids', gidsString);
-      } else {
-        throw new Error('No data found in any of the sheets');
+      let url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv`;
+      if (gid && gid !== '0') {
+        url += `&gid=${gid}`;
       }
+
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Failed to fetch sheet`);
+      const csvText = await response.text();
+      
+      const lines = csvText.split('\n');
+      const words: WordItem[] = lines.slice(1).map((line, idx) => {
+        const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
+        return {
+          id: (idx + 1).toString(),
+          word: parts[1] || '',
+          translation: parts[2] || '',
+          example: parts[3] || '',
+          notes: parts[4] || ''
+        };
+      }).filter(w => w.word !== '');
+
+      setState(prev => ({ 
+        ...prev, 
+        words, 
+        currentIndex: 0,
+        isLoading: false
+      }));
     } catch (error) {
       console.error('Failed to fetch data', error);
       setState(prev => ({ ...prev, isLoading: false }));
-      alert('スプレッドシートの読み込みに失敗しました。各シートが公開設定になっているか確認してください。');
+      alert('シートの読み込みに失敗しました。URLとGIDを確認してください。');
     }
   };
 
-  const handleSettingsSubmit = (e: React.FormEvent) => {
+  const handleApplySettings = (e: React.FormEvent) => {
     e.preventDefault();
     let id = '';
     
@@ -117,66 +133,104 @@ const App: React.FC = () => {
       id = inputUrl;
     }
 
-    if (id) {
-      fetchMultipleSheets(id, inputGids);
-      setState(prev => ({ ...prev, isSettingsOpen: false }));
+    if (id && tempSheets.length > 0) {
+      updateAllSettings(id, tempSheets);
     } else {
-      alert('無効なURLまたはIDです。');
+      alert('有効なURLと、少なくとも1つのシート設定が必要です。');
     }
   };
 
-  const setViewMode = (mode: ViewMode) => {
-    setState(prev => ({ ...prev, viewMode: mode }));
+  const updateAllSettings = (id: string, sheets: SheetConfig[]) => {
+    const firstGid = sheets[0]?.gid || '0';
+    setState(prev => ({ 
+      ...prev, 
+      spreadsheetId: id, 
+      sheets: sheets, 
+      isSettingsOpen: false,
+      currentSheetGid: firstGid
+    }));
+    localStorage.setItem('gemini_word_master_sheet_id', id);
+    localStorage.setItem('gemini_word_master_sheets', JSON.stringify(sheets));
+    fetchSheetData(id, firstGid);
   };
 
-  const handleSelectWordFromList = (index: number) => {
-    setState(prev => ({ ...prev, currentIndex: index, viewMode: 'card' }));
+  const handleJsonImport = () => {
+    try {
+      const config = JSON.parse(jsonInput);
+      if (config.spreadsheetId && Array.isArray(config.sheets)) {
+        setInputUrl(`https://docs.google.com/spreadsheets/d/${config.spreadsheetId}/edit`);
+        setTempSheets(config.sheets);
+        updateAllSettings(config.spreadsheetId, config.sheets);
+        setJsonInput('');
+      } else {
+        throw new Error('Invalid JSON structure');
+      }
+    } catch (e) {
+      alert('JSONの形式が正しくありません。');
+    }
+  };
+
+  const handleJsonExport = () => {
+    const config = {
+      spreadsheetId: state.spreadsheetId,
+      sheets: state.sheets
+    };
+    const jsonStr = JSON.stringify(config, null, 2);
+    navigator.clipboard.writeText(jsonStr);
+    setCopyFeedback(true);
+    setTimeout(() => setCopyFeedback(false), 2000);
+  };
+
+  const addTempSheet = () => {
+    if (newSheetName && newSheetGid) {
+      setTempSheets([...tempSheets, { name: newSheetName, gid: newSheetGid, lang: newSheetLang }]);
+      setNewSheetName('');
+      setNewSheetGid('');
+    }
+  };
+
+  const removeTempSheet = (index: number) => {
+    setTempSheets(tempSheets.filter((_, i) => i !== index));
   };
 
   const currentWord = state.words[state.currentIndex];
+  const currentSheet = state.sheets.find(s => s.gid === state.currentSheetGid);
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
-      <aside className={`bg-white border-r border-slate-200 transition-all duration-300 flex flex-col ${isSidebarOpen ? 'w-80' : 'w-0'}`}>
+    <div className="flex h-screen bg-slate-50 overflow-hidden relative font-sans">
+      {/* Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-slate-200 transition-transform duration-300 flex flex-col w-80 lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 flex items-center justify-between border-b border-slate-100 flex-shrink-0">
           <div className="flex items-center space-x-2">
-            <div className="bg-blue-600 p-2 rounded-lg text-white">
-              <BookOpen size={20} />
-            </div>
+            <div className="bg-blue-600 p-2 rounded-lg text-white"><BookOpen size={20} /></div>
             <h1 className="font-bold text-lg text-slate-800">Word Master</h1>
           </div>
-          <button onClick={() => setIsSidebarOpen(false)} className="text-slate-400 hover:text-slate-600">
-            <X size={20} />
-          </button>
+          <button onClick={() => setIsSidebarOpen(false)} className="text-slate-400 lg:hidden"><X size={20} /></button>
         </div>
 
         <div className="p-4 overflow-y-auto flex-1 custom-scrollbar">
           <div className="flex items-center justify-between mb-4 px-2">
-            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Your List ({state.words.length})</h2>
-            <button 
-              onClick={() => setState(prev => ({ ...prev, isSettingsOpen: true }))}
-              className="text-blue-600 hover:bg-blue-50 p-1 rounded-md transition-colors"
-            >
-              <Plus size={16} />
-            </button>
+            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Words in {currentSheet?.name} ({state.words.length})</h2>
           </div>
           
           <div className="space-y-1">
             {state.words.map((w, idx) => (
               <button
                 key={`${w.id}-${idx}`}
-                onClick={() => setState(prev => ({ ...prev, currentIndex: idx, viewMode: 'card' }))}
-                className={`w-full text-left px-3 py-2 rounded-xl transition-all flex items-center justify-between group ${
-                  idx === state.currentIndex && state.viewMode === 'card'
-                    ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-100' 
-                    : 'text-slate-600 hover:bg-slate-50'
-                }`}
+                onClick={() => {
+                  setState(prev => ({ ...prev, currentIndex: idx, viewMode: 'card' }));
+                  if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                }}
+                className={`w-full text-left px-3 py-3 rounded-xl transition-all flex items-center justify-between group ${idx === state.currentIndex && state.viewMode === 'card' ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-100' : 'text-slate-600 hover:bg-slate-50'}`}
               >
                 <div className="truncate pr-2">
                   <div className="font-semibold text-sm truncate">{w.word}</div>
-                  <div className={`text-xs truncate ${idx === state.currentIndex && state.viewMode === 'card' ? 'text-blue-500' : 'text-slate-400'}`}>
-                    {w.translation}
-                  </div>
+                  <div className={`text-xs truncate ${idx === state.currentIndex && state.viewMode === 'card' ? 'text-blue-500' : 'text-slate-400'}`}>{w.translation}</div>
                 </div>
                 {idx === state.currentIndex && state.viewMode === 'card' && <div className="w-1.5 h-1.5 rounded-full bg-blue-600 flex-shrink-0" />}
               </button>
@@ -185,158 +239,211 @@ const App: React.FC = () => {
         </div>
 
         <div className="p-4 border-t border-slate-100 bg-slate-50">
-          <button 
-            onClick={() => setState(prev => ({ ...prev, isSettingsOpen: true }))}
-            className="w-full flex items-center justify-center space-x-2 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm transition-all"
-          >
-            <Settings size={18} />
-            <span className="font-medium text-sm">Settings & Merge</span>
+          <button onClick={() => { setTempSheets(state.sheets); setState(prev => ({ ...prev, isSettingsOpen: true })); }} className="w-full flex items-center justify-center space-x-2 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm transition-all">
+            <Settings size={18} /><span className="font-medium text-sm">Settings</span>
           </button>
         </div>
       </aside>
 
       <main className="flex-1 flex flex-col relative min-w-0">
-        <header className="h-16 flex items-center justify-between px-6 border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-10">
-          <div className="flex items-center space-x-4">
-            {!isSidebarOpen && (
-              <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
-                <Menu size={20} />
+        <header className="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-10">
+          <div className="flex items-center space-x-3">
+            <button onClick={() => setIsSidebarOpen(true)} className={`p-2 text-slate-500 hover:bg-slate-100 rounded-lg lg:hidden ${isSidebarOpen ? 'invisible' : 'visible'}`}><Menu size={20} /></button>
+            
+            <div className="relative">
+              <button 
+                onClick={() => setIsSheetSelectorOpen(!isSheetSelectorOpen)}
+                className="flex items-center space-x-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors"
+              >
+                <Languages size={16} className="text-blue-600" />
+                <span className="text-sm font-bold truncate max-w-[100px] sm:max-w-none">{currentSheet?.name || 'Select Sheet'}</span>
+                <ChevronDown size={14} className={`transition-transform duration-200 ${isSheetSelectorOpen ? 'rotate-180' : ''}`} />
               </button>
-            )}
-            <div className="flex flex-col">
-              <span className="text-xs text-slate-400 font-medium leading-none">Flashcards</span>
-              <span className="text-sm text-slate-700 font-bold">
-                {state.viewMode === 'card' ? 'Practice Mode' : 'Library View'}
-              </span>
+
+              {isSheetSelectorOpen && (
+                <>
+                  <div className="fixed inset-0 z-20" onClick={() => setIsSheetSelectorOpen(false)} />
+                  <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl z-30 overflow-hidden py-1 animate-in slide-in-from-top-2 duration-200">
+                    {state.sheets.map(sheet => (
+                      <button
+                        key={sheet.gid}
+                        onClick={() => {
+                          setIsSheetSelectorOpen(false);
+                          fetchSheetData(state.spreadsheetId, sheet.gid);
+                        }}
+                        className={`w-full text-left px-4 py-3 text-sm flex items-center space-x-3 transition-colors ${state.currentSheetGid === sheet.gid ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}
+                      >
+                        <Hash size={14} className={state.currentSheetGid === sheet.gid ? 'text-blue-600' : 'text-slate-400'} />
+                        <div className="flex-1 truncate flex flex-col">
+                          <span>{sheet.name}</span>
+                          <span className="text-[10px] opacity-60 uppercase">{sheet.lang === 'zh-TW' ? 'Chinese (TW)' : 'English'}</span>
+                        </div>
+                        {state.currentSheetGid === sheet.gid && <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
           
           <div className="flex items-center bg-slate-100 p-1 rounded-xl">
-            <button 
-              onClick={() => setViewMode('card')}
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                state.viewMode === 'card' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              <CreditCard size={14} />
-              <span>Card</span>
+            <button onClick={() => setState(prev => ({ ...prev, viewMode: 'card' }))} className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${state.viewMode === 'card' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+              <CreditCard size={14} /><span className="hidden xs:inline">Card</span>
             </button>
-            <button 
-              onClick={() => setViewMode('list')}
-              className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                state.viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              <LayoutGrid size={14} />
-              <span>List</span>
+            <button onClick={() => setState(prev => ({ ...prev, viewMode: 'list' }))} className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${state.viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+              <LayoutGrid size={14} /><span className="hidden xs:inline">List</span>
             </button>
-          </div>
-
-          <div className="flex items-center space-x-4">
-             {state.isLoading && <Loader2 size={18} className="animate-spin text-blue-600" />}
-             <div className="hidden sm:flex items-center bg-slate-100 px-3 py-1.5 rounded-full text-xs font-bold text-slate-500">
-               {state.words.length > 0 ? `${state.currentIndex + 1} / ${state.words.length}` : '0 / 0'}
-             </div>
           </div>
         </header>
 
-        <div className="flex-1 flex flex-col lg:flex-row min-h-0">
-          <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/50 overflow-y-auto">
+        <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative">
+          <div className="flex-1 flex flex-col items-center justify-center bg-slate-50/50 overflow-y-auto p-4 sm:p-8 pb-32 lg:pb-8">
             {state.isLoading ? (
               <div className="text-center">
                 <Loader2 className="mx-auto text-blue-500 animate-spin mb-4" size={48} />
-                <p className="text-slate-600 font-bold">Merging multiple sheets...</p>
-                <p className="text-slate-400 text-sm mt-2">Syncing all tabs into one list.</p>
+                <p className="text-slate-600 font-bold">Loading {currentSheet?.name}...</p>
               </div>
             ) : state.viewMode === 'card' ? (
               currentWord ? (
-                <div className="p-8 w-full flex justify-center">
+                <div className="w-full flex justify-center py-4">
                   <WordCard 
-                    item={currentWord}
-                    onNext={() => setState(prev => ({ ...prev, currentIndex: Math.min(prev.words.length - 1, prev.currentIndex + 1) }))}
-                    onPrev={() => setState(prev => ({ ...prev, currentIndex: Math.max(0, prev.currentIndex - 1) }))}
-                    isFirst={state.currentIndex === 0}
-                    isLast={state.currentIndex === state.words.length - 1}
+                    item={currentWord} 
+                    lang={currentSheet?.lang}
+                    onNext={() => setState(prev => ({ ...prev, currentIndex: Math.min(prev.words.length - 1, prev.currentIndex + 1) }))} 
+                    onPrev={() => setState(prev => ({ ...prev, currentIndex: Math.max(0, prev.currentIndex - 1) }))} 
+                    isFirst={state.currentIndex === 0} 
+                    isLast={state.currentIndex === state.words.length - 1} 
                   />
                 </div>
               ) : (
                 <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 max-w-sm text-center">
-                  <Database className="mx-auto text-slate-300 mb-4" size={48} />
-                  <p className="text-slate-600 mb-6">No words found in the provided sheets.</p>
-                  <button 
-                    onClick={() => setState(prev => ({ ...prev, isSettingsOpen: true }))}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all"
-                  >
-                    Configure Sources
-                  </button>
+                  <Database className="mx-auto text-slate-300 mb-4" size={48} /><p className="text-slate-600 mb-6">No words in this sheet.</p>
                 </div>
               )
             ) : (
-              <WordList 
-                words={state.words} 
-                onSelectWord={handleSelectWordFromList} 
-              />
+              <WordList words={state.words} onSelectWord={(idx) => setState(prev => ({ ...prev, currentIndex: idx, viewMode: 'card' }))} />
             )}
           </div>
 
-          {state.viewMode === 'card' && currentWord && (
-            <div className="w-full lg:w-96 hidden md:block">
-              <GeminiAssistant key={currentWord.id + currentWord.word} currentWord={currentWord} />
+          <div className={`fixed inset-0 z-50 lg:relative lg:inset-auto lg:z-0 lg:w-96 bg-white transition-transform duration-300 ${state.viewMode === 'card' && currentWord ? 'block' : 'hidden'} ${isAssistantOpenMobile ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'} lg:block lg:border-l lg:border-slate-200`}>
+            <div className="lg:hidden flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50">
+              <span className="font-bold text-slate-700">Gemini Tutor</span>
+              <button onClick={() => setIsAssistantOpenMobile(false)} className="p-2 text-slate-400"><X size={24} /></button>
             </div>
+            {currentWord && <GeminiAssistant key={currentWord.id + currentWord.word} currentWord={currentWord} />}
+          </div>
+
+          {state.viewMode === 'card' && currentWord && !isAssistantOpenMobile && (
+            <button onClick={() => setIsAssistantOpenMobile(true)} className="lg:hidden fixed right-6 bottom-6 bg-blue-600 text-white p-4 rounded-full shadow-2xl z-40 animate-pulse border-2 border-white"><MessageSquare size={24} /></button>
           )}
         </div>
       </main>
 
+      {/* Settings Modal */}
       {state.isSettingsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 transform transition-all">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 sm:p-8 flex flex-col max-h-[90vh]">
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-blue-100 text-blue-600 rounded-xl">
-                  <Layers size={24} />
-                </div>
-                <h2 className="text-xl font-bold text-slate-800">Merge Sheets</h2>
+                <div className="p-2 bg-blue-100 text-blue-600 rounded-xl"><Settings size={24} /></div>
+                <h2 className="text-xl font-bold text-slate-800">Advanced Settings</h2>
               </div>
-              <button onClick={() => setState(prev => ({ ...prev, isSettingsOpen: false }))} className="text-slate-400 hover:text-slate-600">
-                <X size={24} />
-              </button>
+              <button onClick={() => setState(prev => ({ ...prev, isSettingsOpen: false }))} className="text-slate-400 p-2 hover:bg-slate-100 rounded-full transition-colors"><X size={24} /></button>
             </div>
 
-            <form onSubmit={handleSettingsSubmit} className="space-y-4">
-              <div>
+            <div className="flex-1 overflow-y-auto space-y-6 pr-2 custom-scrollbar">
+              <section>
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Spreadsheet URL</label>
-                <input 
-                  type="text"
-                  value={inputUrl}
-                  onChange={(e) => setInputUrl(e.target.value)}
-                  placeholder="https://docs.google.com/spreadsheets/d/..."
-                  className="w-full px-4 py-3 bg-slate-100 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 text-sm"
-                  required
-                />
-              </div>
+                <input type="text" value={inputUrl} onChange={(e) => setInputUrl(e.target.value)} className="w-full px-4 py-3 bg-slate-100 border-2 border-transparent focus:border-blue-500 rounded-2xl outline-none text-sm transition-all" placeholder="Paste spreadsheet link here..." />
+              </section>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Target GIDs</label>
-                <input 
-                  type="text"
-                  value={inputGids}
-                  onChange={(e) => setInputGids(e.target.value)}
-                  placeholder="e.g., 0, 420352437"
-                  className="w-full px-4 py-3 bg-slate-100 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 text-sm"
-                />
-              </div>
+              <section>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-3">Sheet Tabs (Dropdown Items)</label>
+                <div className="space-y-2 mb-4">
+                  {tempSheets.map((sheet, index) => (
+                    <div key={index} className="flex items-center space-x-2 p-3 bg-slate-50 rounded-2xl border border-slate-200 group">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-bold text-slate-700 truncate">{sheet.name}</div>
+                        <div className="text-[10px] text-slate-400">GID: {sheet.gid} • {sheet.lang === 'zh-TW' ? 'Chinese (TW)' : 'English'}</div>
+                      </div>
+                      <button onClick={() => removeTempSheet(index)} className="p-2 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"><Trash2 size={16} /></button>
+                    </div>
+                  ))}
+                </div>
 
-              <button 
-                type="submit"
-                disabled={state.isLoading}
-                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition-all disabled:opacity-50"
-              >
-                Apply & Sync All
-              </button>
-            </form>
+                <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100 space-y-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    <input type="text" placeholder="Sheet Name" value={newSheetName} onChange={(e) => setNewSheetName(e.target.value)} className="px-3 py-2 bg-white rounded-xl text-sm border-none outline-none ring-1 ring-blue-100" />
+                    <input type="text" placeholder="GID (e.g. 0)" value={newSheetGid} onChange={(e) => setNewSheetGid(e.target.value)} className="px-3 py-2 bg-white rounded-xl text-sm border-none outline-none ring-1 ring-blue-100" />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase flex-shrink-0">Language:</label>
+                    <select 
+                      value={newSheetLang}
+                      onChange={(e) => setNewSheetLang(e.target.value)}
+                      className="flex-1 px-3 py-2 bg-white rounded-xl text-sm border-none outline-none ring-1 ring-blue-100"
+                    >
+                      <option value="en-US">English (US)</option>
+                      <option value="zh-TW">Taiwanese Mandarin (繁體中文)</option>
+                    </select>
+                  </div>
+                  <button onClick={addTempSheet} disabled={!newSheetName || !newSheetGid} className="w-full flex items-center justify-center space-x-2 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold disabled:opacity-50 transition-all hover:bg-blue-700">
+                    <Plus size={16} /><span>Add Sheet to Menu</span>
+                  </button>
+                </div>
+              </section>
+
+              {/* JSON Import/Export Section */}
+              <section className="pt-4 border-t border-slate-100">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="text-xs font-bold text-slate-400 uppercase flex items-center space-x-2">
+                    <FileJson size={14} /><span>JSON Config (Backup/Share)</span>
+                  </label>
+                  <button 
+                    onClick={handleJsonExport}
+                    className="flex items-center space-x-1 text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-colors uppercase"
+                  >
+                    {copyFeedback ? <ClipboardCheck size={14} /> : <Copy size={14} />}
+                    <span>{copyFeedback ? 'Copied!' : 'Copy to Clipboard'}</span>
+                  </button>
+                </div>
+                
+                <div className="relative group">
+                  <textarea 
+                    value={jsonInput}
+                    onChange={(e) => setJsonInput(e.target.value)}
+                    placeholder='Paste configuration JSON here to import...'
+                    className="w-full h-24 p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[10px] font-mono outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
+                  />
+                  {jsonInput && (
+                    <button 
+                      onClick={handleJsonImport}
+                      className="absolute bottom-3 right-3 flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-[10px] font-bold shadow-lg hover:bg-blue-700 transition-all"
+                    >
+                      <Upload size={12} /><span>Import JSON</span>
+                    </button>
+                  )}
+                </div>
+                <p className="mt-2 text-[10px] text-slate-400 leading-tight">
+                  このJSONテキストを保存しておくことで、別のブラウザでも同じ設定を復元できます。
+                </p>
+              </section>
+            </div>
+
+            <div className="pt-6 mt-4 border-t border-slate-100">
+              <button onClick={handleApplySettings} className="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-black transition-all shadow-lg">Save and Refresh List</button>
+            </div>
           </div>
         </div>
       )}
+
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        @media (max-width: 400px) { .xs\\:inline { display: inline !important; } }
+      `}</style>
     </div>
   );
 };

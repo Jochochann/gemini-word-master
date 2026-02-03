@@ -1,6 +1,7 @@
+
 {
-  "name": "Gemini Word Master",
-  "description": "An interactive English vocabulary learning app that synchronizes with Google Spreadsheets and utilizes Gemini AI for deep contextual understanding and practice.",
+  "name": "Gemini Multi-Language Master",
+  "description": "An interactive multilingual vocabulary learning app that synchronizes with Google Spreadsheets and utilizes Gemini AI for deep contextual understanding and practice in various languages including English and Taiwanese Mandarin.",
   "requestFramePermissions": [
     "microphone"
   ]
