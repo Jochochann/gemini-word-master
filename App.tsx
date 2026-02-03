@@ -24,7 +24,9 @@ import {
   FileJson,
   Upload,
   AlertCircle,
-  Key
+  Key,
+  Home,
+  Play
 } from 'lucide-react';
 
 const DEFAULT_SHEET_ID = '1Ul94nfm4HbnoIeUyElhBXC6gPOsbbU-nsDjkzoY_gPU';
@@ -43,7 +45,7 @@ const App: React.FC = () => {
     sheets: [],
     currentSheetGid: '',
     isSettingsOpen: false,
-    viewMode: 'card'
+    viewMode: 'list'
   });
 
   const [inputUrl, setInputUrl] = useState('');
@@ -57,7 +59,6 @@ const App: React.FC = () => {
   const [isSheetSelectorOpen, setIsSheetSelectorOpen] = useState(false);
   const [hasApiKey, setHasApiKey] = useState<boolean>(true);
 
-  // Unused state variables kept for potential future expansion
   const [jsonInput, setJsonInput] = useState('');
   const [copyFeedback, setCopyFeedback] = useState(false);
 
@@ -184,7 +185,6 @@ const App: React.FC = () => {
     fetchSheetData(id, firstGid);
   };
 
-  // Fix: Implemented missing addTempSheet function to allow users to add new spreadsheet tabs
   const addTempSheet = () => {
     if (newSheetName.trim() && newSheetGid.trim()) {
       const newSheet: SheetConfig = {
@@ -198,6 +198,16 @@ const App: React.FC = () => {
     }
   };
 
+  const switchToCard = () => {
+    setState(prev => ({ ...prev, viewMode: 'card' }));
+    if (window.innerWidth < 1024) setIsSidebarOpen(false);
+  };
+
+  const switchToList = () => {
+    setState(prev => ({ ...prev, viewMode: 'list' }));
+    if (window.innerWidth < 1024) setIsSidebarOpen(false);
+  };
+
   const currentWord = state.words[state.currentIndex];
 
   return (
@@ -208,15 +218,36 @@ const App: React.FC = () => {
 
       <aside className={`fixed inset-y-0 left-0 z-50 bg-white border-r border-slate-200 transition-transform duration-300 flex flex-col w-80 lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 flex items-center justify-between border-b border-slate-100 flex-shrink-0">
-          <div className="flex items-center space-x-2">
-            <div className="bg-blue-600 p-2 rounded-lg text-white shadow-md"><BookOpen size={20} /></div>
+          <button onClick={switchToCard} className="flex items-center space-x-2 group">
+            <div className="bg-blue-600 p-2 rounded-lg text-white shadow-md group-hover:scale-110 transition-transform"><BookOpen size={20} /></div>
             <h1 className="font-bold text-xl text-slate-800 tracking-tight">Word Master</h1>
-          </div>
+          </button>
           <button onClick={() => setIsSidebarOpen(false)} className="text-slate-400 p-1 hover:bg-slate-100 rounded lg:hidden"><X size={20} /></button>
         </div>
 
         <div className="p-4 overflow-y-auto flex-1 custom-scrollbar">
           <div className="space-y-1.5">
+            {/* Study Mode - Main Action */}
+            <button
+              onClick={switchToCard}
+              className={`w-full text-left px-4 py-4 rounded-xl transition-all flex items-center space-x-3 group mb-2 ${state.viewMode === 'card' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-600 hover:bg-slate-50 border border-transparent hover:border-slate-100'}`}
+            >
+              <Play size={20} className={state.viewMode === 'card' ? 'text-blue-200' : 'text-blue-500'} />
+              <span className="font-bold text-base">学習を始める (カード)</span>
+            </button>
+
+            {/* List View - Secondary Action */}
+            <button
+              onClick={switchToList}
+              className={`w-full text-left px-4 py-4 rounded-xl transition-all flex items-center space-x-3 group mb-2 ${state.viewMode === 'list' ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-600 hover:bg-slate-50 border border-transparent hover:border-slate-100'}`}
+            >
+              <LayoutGrid size={20} className={state.viewMode === 'list' ? 'text-blue-400' : 'text-slate-400'} />
+              <span className="font-bold text-base">ライブラリ (一覧)</span>
+            </button>
+
+            <div className="h-px bg-slate-100 w-full my-3" />
+            <div className="px-2 pb-2 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">単語リスト</div>
+
             {state.words.map((w, idx) => (
               <button
                 key={`${w.id}-${idx}`}
@@ -251,6 +282,7 @@ const App: React.FC = () => {
         <header className="h-16 flex items-center justify-between px-2 sm:px-4 border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-30">
           <div className="flex items-center space-x-1 sm:space-x-3">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg lg:hidden"><Menu size={20} /></button>
+
             <div className="relative">
               <button onClick={() => setIsSheetSelectorOpen(!isSheetSelectorOpen)} className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors shadow-sm">
                 <Languages size={16} className="text-blue-600 hidden xs:inline" />
