@@ -1,25 +1,29 @@
 
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 
-const getAIClient = () => {
+export const getAIClient = () => {
+  // Always create a new instance right before making an API call 
+  // to ensure it uses the most up-to-date API key from the dialog.
   return new GoogleGenAI({ apiKey: process.env.API_KEY });
 };
 
-export const askAboutWord = async (word: string, question: string, context?: string) => {
+export const askAboutWord = async (word: string, question: string, translation?: string) => {
   const ai = getAIClient();
   const systemInstruction = `
-    You are an expert language tutor. 
-    The user is studying the word or phrase: "${word}".
-    ${context ? `Known Translation/Meaning: ${context}` : ''}
-    Provide clear, concise, and helpful explanations. 
-    If it's English, explain nuances and synonyms. 
-    If it's Chinese/Taiwanese Mandarin, provide Pinyin or Zhuyin, and explain character usage.
-    Answer in the same language as the user's question (Japanese or English).
+    あなたは親切で優秀な語学講師です。
+    ユーザーは現在、以下の単語/フレーズを学習しています: "${word}"
+    ${translation ? `提示されている意味: ${translation}` : ''}
+    
+    【回答ルール】
+    1. 必ず日本語で回答してください。
+    2. 解説は簡潔かつ明快に行ってください。
+    3. 英単語の場合は、日本人が間違いやすいニュアンスの違いや、類義語との使い分けに重点を置いてください。
+    4. 中国語（台湾華語）の場合は、ピンインや注音を添え、漢字の意味や日常会話での使われ方を説明してください。
   `;
 
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
-    contents: `${question}`,
+    contents: [{ role: 'user', parts: [{ text: question }] }],
     config: {
       systemInstruction,
       temperature: 0.7,
@@ -29,21 +33,25 @@ export const askAboutWord = async (word: string, question: string, context?: str
   return response.text;
 };
 
-export const streamAssistant = async function* (word: string, translation: string, history: {role: string, parts: any[]}[]) {
+export const streamAssistantResponse = async function* (word: string, translation: string, question: string) {
   const ai = getAIClient();
-  
-  const chat = ai.chats.create({
+  const systemInstruction = `
+    あなたはプロの語学講師です。生徒が「${word}」（意味: ${translation}）を学習するのを手伝ってください。
+    回答は必ず【日本語】で行ってください。
+    日本人の学習者が直感的に理解できるように、語源、文化的な背景、あるいは類義語との比較を交えて解説してください。
+  `;
+
+  const stream = await ai.models.generateContentStream({
     model: 'gemini-3-flash-preview',
+    contents: [{ role: 'user', parts: [{ text: question }] }],
     config: {
-      systemInstruction: `You are a language tutor helping a student learn "${word}" ("${translation}"). Be encouraging, professional, and educational.`,
+      systemInstruction,
+      temperature: 0.7,
     }
   });
 
-  const lastMessage = history[history.length - 1]?.parts[0]?.text || `Explain "${word}" to me.`;
-  
-  const result = await chat.sendMessageStream({ message: lastMessage });
-  
-  for await (const chunk of result) {
-    yield (chunk as GenerateContentResponse).text;
+  for await (const chunk of stream) {
+    const text = (chunk as GenerateContentResponse).text;
+    if (text) yield text;
   }
 };

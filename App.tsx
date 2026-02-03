@@ -22,14 +22,16 @@ import {
   Copy,
   ClipboardCheck,
   FileJson,
-  Upload
+  Upload,
+  AlertCircle,
+  Key
 } from 'lucide-react';
 
 const DEFAULT_SHEET_ID = '1Ul94nfm4HbnoIeUyElhBXC6gPOsbbU-nsDjkzoY_gPU';
 const DEFAULT_SHEETS: SheetConfig[] = [
   { name: 'GoFluent', gid: '420352437', lang: 'en-US' },
   { name: 'Atsueigo', gid: '0', lang: 'en-US' },
-  { name: '台湾華語', gid: '1574869365', lang: 'zh-TW' }
+  { name: '台湾旅行', gid: '1574869365', lang: 'zh-TW' }
 ];
 
 const App: React.FC = () => {
@@ -53,12 +55,21 @@ const App: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAssistantOpenMobile, setIsAssistantOpenMobile] = useState(false);
   const [isSheetSelectorOpen, setIsSheetSelectorOpen] = useState(false);
+  const [hasApiKey, setHasApiKey] = useState<boolean>(true);
 
   const [jsonInput, setJsonInput] = useState('');
   const [copyFeedback, setCopyFeedback] = useState(false);
 
   // Initialize App
   useEffect(() => {
+    const checkApiKey = async () => {
+      if (window.aistudio?.hasSelectedApiKey) {
+        const hasKey = await window.aistudio.hasSelectedApiKey();
+        setHasApiKey(hasKey);
+      }
+    };
+    checkApiKey();
+
     if (window.innerWidth >= 1024) {
       setIsSidebarOpen(true);
     }
@@ -111,7 +122,6 @@ const App: React.FC = () => {
 
       const lines = csvText.split('\n');
       const words: WordItem[] = lines.slice(1).map((line, idx) => {
-        // Basic CSV parsing for comma-separated values, ignoring commas inside quotes
         const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
         return {
           id: (idx + 1).toString(),
@@ -132,6 +142,13 @@ const App: React.FC = () => {
       console.error('Failed to fetch data', error);
       setState(prev => ({ ...prev, isLoading: false }));
       alert('シートの読み込みに失敗しました。URLとGID、またはスプレッドシートの「ウェブに公開」設定を確認してください。');
+    }
+  };
+
+  const handleOpenApiKey = async () => {
+    if (window.aistudio?.openSelectKey) {
+      await window.aistudio.openSelectKey();
+      setHasApiKey(true);
     }
   };
 
@@ -258,7 +275,15 @@ const App: React.FC = () => {
           </div>
         </div>
 
-        <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+        <div className="p-4 border-t border-slate-100 bg-slate-50/50 space-y-2">
+          {!hasApiKey && (
+            <button
+              onClick={handleOpenApiKey}
+              className="w-full flex items-center justify-center space-x-2 py-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-700 hover:bg-amber-100 shadow-sm transition-all"
+            >
+              <Key size={18} /><span className="font-bold text-xs uppercase tracking-wider">Connect Gemini</span>
+            </button>
+          )}
           <button onClick={() => { setTempSheets([...state.sheets]); setState(prev => ({ ...prev, isSettingsOpen: true })); }} className="w-full flex items-center justify-center space-x-2 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm transition-all active:scale-95">
             <Settings size={18} /><span className="font-bold text-xs uppercase tracking-wider">Settings</span>
           </button>
@@ -284,9 +309,9 @@ const App: React.FC = () => {
                 <>
                   <div className="fixed inset-0 z-20" onClick={() => setIsSheetSelectorOpen(false)} />
                   <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl z-30 overflow-hidden py-1 animate-in slide-in-from-top-2 duration-200">
-                    {state.sheets.map(sheet => (
+                    {state.sheets.map((sheet, sIdx) => (
                       <button
-                        key={sheet.gid}
+                        key={`${sheet.gid}-${sheet.name}-${sIdx}`}
                         onClick={() => {
                           setIsSheetSelectorOpen(false);
                           fetchSheetData(state.spreadsheetId, sheet.gid);
@@ -390,7 +415,7 @@ const App: React.FC = () => {
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Sheet Tabs (Menu Items)</label>
                 <div className="space-y-2 mb-4">
                   {tempSheets.map((sheet, index) => (
-                    <div key={index} className="flex items-center space-x-2 p-3 bg-slate-50 rounded-2xl border border-slate-200 group transition-all hover:border-blue-200">
+                    <div key={`${sheet.gid}-${index}`} className="flex items-center space-x-2 p-3 bg-slate-50 rounded-2xl border border-slate-200 group transition-all hover:border-blue-200">
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-bold text-slate-700 truncate">{sheet.name}</div>
                         <div className="text-[10px] text-slate-400 font-mono">GID: {sheet.gid} • {sheet.lang === 'zh-TW' ? 'Taiwanese' : 'English'}</div>
