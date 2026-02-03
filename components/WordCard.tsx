@@ -62,14 +62,16 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
             {item.example && (
               <div className="bg-slate-50 p-5 sm:p-7 rounded-2xl border border-slate-100 relative">
                 <Quote className="absolute top-4 right-5 text-slate-200" size={24} />
-                <p className="text-sm sm:text-xl text-slate-700 italic leading-relaxed pr-10">"{item.example}"</p>
+                {/* Increased text size from text-sm sm:text-xl to text-lg sm:text-2xl */}
+                <p className="text-lg sm:text-2xl text-slate-700 italic leading-relaxed pr-10">"{item.example}"</p>
               </div>
             )}
 
             {item.notes && (
               <div className="flex items-start space-x-3.5 p-5 sm:p-7 bg-amber-50/50 rounded-2xl border border-amber-100/50">
                 <Lightbulb size={22} className="text-amber-500 mt-1 flex-shrink-0" />
-                <p className="text-sm sm:text-lg text-slate-600 leading-relaxed font-medium">{item.notes}</p>
+                {/* Increased text size from text-sm sm:text-lg to text-base sm:text-xl */}
+                <p className="text-base sm:text-xl text-slate-600 leading-relaxed font-medium">{item.notes}</p>
               </div>
             )}
           </div>
