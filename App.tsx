@@ -29,8 +29,8 @@ import {
 
 const DEFAULT_SHEET_ID = '1Ul94nfm4HbnoIeUyElhBXC6gPOsbbU-nsDjkzoY_gPU';
 const DEFAULT_SHEETS: SheetConfig[] = [
-  { name: 'GoFluent', gid: '420352437', lang: 'en-US' },
-  { name: 'Atsueigo', gid: '0', lang: 'en-US' },
+  { name: 'GoFluent', gid: '0', lang: 'en-US' },
+  { name: 'Atsueigo', gid: '420352437', lang: 'en-US' },
   { name: '台湾旅行', gid: '1574869365', lang: 'zh-TW' }
 ];
 
@@ -343,7 +343,7 @@ const App: React.FC = () => {
         </header>
 
         <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative">
-          <div className="flex-1 flex flex-col items-center justify-start lg:justify-center bg-slate-50/50 overflow-y-auto p-4 sm:p-8 pt-6 sm:pt-8 pb-32 lg:pb-8">
+          <div className="flex-1 flex flex-col items-center justify-start lg:justify-center bg-slate-50/50 overflow-y-auto p-4 sm:p-8 pt-24 sm:pt-12 pb-32 lg:pb-8">
             {state.isLoading ? (
               <div className="text-center animate-pulse py-20">
                 <Loader2 className="mx-auto text-blue-500 animate-spin mb-4" size={48} />

@@ -34,22 +34,22 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
 
   return (
     <div className="relative w-full max-w-xl mx-auto px-4 sm:px-0">
-      <div className="min-h-[400px] sm:min-h-[480px] bg-white rounded-3xl shadow-xl border border-slate-200 flex flex-col p-6 sm:p-10 relative overflow-hidden">
+      <div className="h-[520px] sm:h-[600px] bg-white rounded-3xl shadow-xl border border-slate-200 flex flex-col p-6 sm:p-10 relative overflow-hidden">
         {/* Decorative Background Element */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -mr-10 -mt-10 opacity-50 z-0" />
 
-        <div className="relative z-10 flex flex-col h-full">
-          {/* Header Area */}
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex flex-col">
+        <div className="relative z-10 flex flex-col h-full overflow-hidden">
+          {/* Header Area - Fixed Height */}
+          <div className="flex justify-between items-start mb-6 flex-shrink-0">
+            <div className="flex flex-col min-w-0">
               <span className="text-[10px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded-md uppercase tracking-widest mb-2 w-fit">
                 {lang === 'zh-TW' ? 'Taiwanese' : 'English'}
               </span>
-              <h2 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight break-words">
+              <h2 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight break-words pr-4">
                 {item.word}
               </h2>
             </div>
-            <button 
+            <button
               onClick={handleManualSpeak}
               className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-95 flex-shrink-0"
               title="Speak"
@@ -58,17 +58,18 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
             </button>
           </div>
 
-          <div className="h-px bg-slate-100 w-full mb-8" />
+          <div className="h-px bg-slate-100 w-full mb-6 flex-shrink-0" />
 
-          {/* Meaning Section */}
-          <div className="mb-8">
-            <p className="text-2xl sm:text-3xl font-bold text-blue-700 leading-tight">
-              {item.translation}
-            </p>
-          </div>
+          {/* Scrollable Content Area */}
+          <div className="flex-1 overflow-y-auto pr-2 custom-card-scrollbar space-y-6">
+            {/* Meaning Section */}
+            <div className="mb-2">
+              <p className="text-2xl sm:text-3xl font-bold text-blue-700 leading-tight">
+                {item.translation}
+              </p>
+            </div>
 
-          {/* Details Section */}
-          <div className="space-y-6 flex-1">
+            {/* Details Section */}
             {item.example && (
               <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 relative">
                 <Quote className="absolute top-3 right-4 text-slate-200" size={20} />
@@ -128,6 +129,12 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
           <ChevronRight size={24} />
         </button>
       </div>
+
+      <style>{`
+        .custom-card-scrollbar::-webkit-scrollbar { width: 3px; }
+        .custom-card-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-card-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+      `}</style>
     </div>
   );
 };
