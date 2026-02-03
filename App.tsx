@@ -1,9 +1,9 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { AppState, WordItem, ViewMode } from './types';
-import WordCard from './components/WordCard';
-import WordList from './components/WordList';
-import GeminiAssistant from './components/GeminiAssistant';
+import React, { useState, useEffect } from 'react';
+import { AppState, WordItem, ViewMode } from './types.ts';
+import WordCard from './components/WordCard.tsx';
+import WordList from './components/WordList.tsx';
+import GeminiAssistant from './components/GeminiAssistant.tsx';
 import { 
   Database, 
   Settings, 
@@ -41,13 +41,12 @@ const App: React.FC = () => {
     const savedGids = localStorage.getItem('gemini_word_master_sheet_gids');
     
     const targetId = savedId || DEFAULT_SHEET_ID;
-    const targetId_final = targetId || DEFAULT_SHEET_ID;
     const targetGids = savedGids || DEFAULT_GIDS;
     
-    setInputUrl(`https://docs.google.com/spreadsheets/d/${targetId_final}/edit`);
+    setInputUrl(`https://docs.google.com/spreadsheets/d/${targetId}/edit`);
     setInputGids(targetGids);
     
-    fetchMultipleSheets(targetId_final, targetGids);
+    fetchMultipleSheets(targetId, targetGids);
   }, []);
 
   const fetchSingleSheet = async (id: string, gid: string): Promise<Omit<WordItem, 'id'>[]> => {
@@ -63,7 +62,6 @@ const App: React.FC = () => {
     const lines = csvText.split('\n');
     return lines.slice(1).map((line) => {
       const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
-      // Column Mapping: [No, Word, Translation, Example, Notes]
       return {
         word: parts[1] || '',
         translation: parts[2] || '',
@@ -139,7 +137,6 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">
-      {/* Sidebar */}
       <aside className={`bg-white border-r border-slate-200 transition-all duration-300 flex flex-col ${isSidebarOpen ? 'w-80' : 'w-0'}`}>
         <div className="p-6 flex items-center justify-between border-b border-slate-100 flex-shrink-0">
           <div className="flex items-center space-x-2">
@@ -198,7 +195,6 @@ const App: React.FC = () => {
         </div>
       </aside>
 
-      {/* Main Content Area */}
       <main className="flex-1 flex flex-col relative min-w-0">
         <header className="h-16 flex items-center justify-between px-6 border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-10">
           <div className="flex items-center space-x-4">
@@ -291,7 +287,6 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Settings Modal (Same as before) */}
       {state.isSettingsOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 transform transition-all">
@@ -307,10 +302,6 @@ const App: React.FC = () => {
               </button>
             </div>
 
-            <p className="text-slate-500 text-sm mb-6">
-              You can merge multiple tabs from your Google Spreadsheet into one vocabulary list.
-            </p>
-
             <form onSubmit={handleSettingsSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Spreadsheet URL</label>
@@ -325,57 +316,27 @@ const App: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Target GIDs (Comma separated)</label>
+                <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Target GIDs</label>
                 <input 
                   type="text"
                   value={inputGids}
                   onChange={(e) => setInputGids(e.target.value)}
-                  placeholder="e.g., 0, 420352437, 12345678"
+                  placeholder="e.g., 0, 420352437"
                   className="w-full px-4 py-3 bg-slate-100 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 text-sm"
                 />
-                <p className="text-[10px] text-slate-400 mt-1">※ GIDはスプレッドシートのURLの末尾（gid=数字）にあります。</p>
-              </div>
-
-              <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-start space-x-3">
-                <ExternalLink className="text-blue-600 mt-1 flex-shrink-0" size={18} />
-                <div className="text-xs text-blue-700 leading-relaxed">
-                  <p className="font-bold mb-1">How it works:</p>
-                  <p>Each GID represents a specific tab in your sheet. We will fetch and combine all of them automatically.</p>
-                </div>
               </div>
 
               <button 
                 type="submit"
                 disabled={state.isLoading}
-                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold shadow-lg shadow-blue-200 transition-all disabled:opacity-50 flex items-center justify-center"
+                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition-all disabled:opacity-50"
               >
-                {state.isLoading ? (
-                  <>
-                    <Loader2 size={20} className="animate-spin mr-2" />
-                    Merging...
-                  </>
-                ) : 'Apply & Sync All'}
+                Apply & Sync All
               </button>
             </form>
           </div>
         </div>
       )}
-
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 5px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #e2e8f0;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #cbd5e1;
-        }
-      `}</style>
     </div>
   );
 };

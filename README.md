@@ -1,20 +1,40 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Gemini Word Master 📚
 
-# Run and deploy your AI Studio app
+Googleスプレッドシートと連携し、Gemini AIがサポートしてくれる英単語学習アプリです。
 
-This contains everything you need to run your app locally.
+## 特徴
+- **スプレッドシート連携**: 自分の単語帳をGoogleスプレッドシートで管理し、同期できます。
+- **複数シート対応**: 複数のタブ（GID）を統合して一つのリストとして学習可能です。
+- **Gemini Tutor**: 単語のニュアンスや例文、語源などをAIに質問できます。
+- **自動読み上げ**: 単語を表示すると自動でネイティブの発音を確認できます。
+- **2つのモード**: カード形式（暗記用）とリスト形式（一覧確認用）を切り替え可能。
 
-View your app in AI Studio: https://ai.studio/apps/drive/1qi40Ki32h7GA9DghxQvo9wncKUZh2MNS
+## セットアップ
 
-## Run Locally
+### 1. 依存関係のインストール
+```bash
+npm install
+```
 
-**Prerequisites:**  Node.js
+### 2. 環境変数の設定
+`.env` ファイルを作成し、Gemini APIキーを設定してください。
+```env
+API_KEY=あなたのAPI_KEY
+```
 
+### 3. 開発サーバーの起動
+```bash
+npm run dev
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## スプレッドシートの準備
+1. スプレッドシートを「リンクを知っている全員」に閲覧許可で公開します。
+2. 以下の列構成で作成してください：
+   - A列: ID (任意)
+   - B列: 英単語
+   - C列: 意味/翻訳
+   - D列: 例文
+   - E列: 補足/ノート
+
+## ライセンス
+MIT
