@@ -105,23 +105,25 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
         {messages.length === 0 && (
           <div className="text-center py-16">
             <Bot className="mx-auto text-slate-200 mb-5" size={72} />
-            <p className="text-slate-500 text-base leading-relaxed">
-              <span className="font-bold text-blue-600 text-lg block mb-1">{currentWord.word}</span> について何でも聞いてください。
+            {/* Increased font size of placeholder text */}
+            <p className="text-slate-500 text-lg leading-relaxed">
+              <span className="font-bold text-blue-600 text-2xl block mb-2">{currentWord.word}</span> について何でも聞いてください。
             </p>
           </div>
         )}
 
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[92%] rounded-2xl p-4 text-base flex space-x-3 ${msg.role === 'user'
+            {/* Increased text size of messages from text-base to text-lg sm:text-xl */}
+            <div className={`max-w-[92%] rounded-2xl p-5 text-lg sm:text-xl flex space-x-3 ${msg.role === 'user'
                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
                 : 'bg-slate-100 text-slate-800 border border-slate-200 shadow-sm'
               }`}>
-              <div className="mt-1 flex-shrink-0">
-                {msg.role === 'user' ? <User size={16} /> : <Bot size={16} className="text-blue-500" />}
+              <div className="mt-1.5 flex-shrink-0">
+                {msg.role === 'user' ? <User size={18} /> : <Bot size={18} className="text-blue-500" />}
               </div>
               <div className="whitespace-pre-wrap leading-relaxed">
-                {msg.text || (msg.role === 'model' && isTyping && i === messages.length - 1 ? <Loader2 size={16} className="animate-spin inline" /> : '')}
+                {msg.text || (msg.role === 'model' && isTyping && i === messages.length - 1 ? <Loader2 size={20} className="animate-spin inline" /> : '')}
               </div>
             </div>
           </div>
@@ -129,8 +131,8 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
 
         {error && (
           <div className="p-5 bg-red-50 border border-red-100 rounded-2xl space-y-4">
-            <div className="text-red-600 text-sm flex items-start space-x-2.5 font-bold">
-              <AlertCircle size={18} className="mt-0.5 flex-shrink-0" />
+            <div className="text-red-600 text-base flex items-start space-x-2.5 font-bold">
+              <AlertCircle size={20} className="mt-0.5 flex-shrink-0" />
               <span>{error}</span>
             </div>
             {needsApiKey && (
@@ -147,8 +149,9 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
 
         {isTyping && messages[messages.length - 1]?.role === 'user' && (
           <div className="flex justify-start">
-            <div className="bg-slate-50 rounded-2xl p-4 text-base flex items-center space-x-3 border border-slate-100">
-              <Loader2 size={18} className="animate-spin text-blue-500" />
+            {/* Increased text size of typing indicator */}
+            <div className="bg-slate-50 rounded-2xl p-4 text-lg flex items-center space-x-3 border border-slate-100">
+              <Loader2 size={20} className="animate-spin text-blue-500" />
               <span className="text-slate-500 italic font-medium">Gemini が回答を作成中...</span>
             </div>
           </div>
@@ -163,7 +166,8 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
               key={q}
               onClick={() => handleSend(q)}
               disabled={isTyping}
-              className="text-xs font-bold px-3 py-2 bg-white hover:bg-blue-600 text-slate-600 hover:text-white rounded-xl border border-slate-200 hover:border-blue-600 transition-all shadow-sm active:scale-95 disabled:opacity-50"
+              /* Increased text size of quick question buttons slightly */
+              className="text-sm font-bold px-3.5 py-2.5 bg-white hover:bg-blue-600 text-slate-600 hover:text-white rounded-xl border border-slate-200 hover:border-blue-600 transition-all shadow-sm active:scale-95 disabled:opacity-50"
             >
               {q}
             </button>
@@ -184,7 +188,8 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
               }
             }}
             placeholder="質問を入力..."
-            className="w-full pl-5 pr-14 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 resize-none text-base transition-all outline-none"
+            /* Increased text size of input area to text-lg sm:text-xl */
+            className="w-full pl-5 pr-14 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 resize-none text-lg sm:text-xl transition-all outline-none"
           />
           <button
             onClick={() => handleSend()}
@@ -192,7 +197,7 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
             className={`absolute right-3 bottom-3 p-2.5 rounded-xl transition-all active:scale-90 ${input.trim() && !isTyping ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-300'
               }`}
           >
-            <Send size={24} />
+            <Send size={28} />
           </button>
         </div>
       </div>
