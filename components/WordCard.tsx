@@ -34,7 +34,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
 
   return (
     <div className="relative w-full max-w-xl mx-auto px-4 sm:px-0">
-      <div className="h-[520px] sm:h-[600px] bg-white rounded-3xl shadow-xl border border-slate-200 flex flex-col p-6 sm:p-10 relative overflow-hidden">
+      <div className="h-[480px] sm:h-[600px] bg-white rounded-3xl shadow-xl border border-slate-200 flex flex-col p-6 sm:p-10 relative overflow-hidden">
         {/* Decorative Background Element */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -mr-10 -mt-10 opacity-50 z-0" />
 
@@ -45,7 +45,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
               <span className="text-[10px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded-md uppercase tracking-widest mb-2 w-fit">
                 {lang === 'zh-TW' ? 'Taiwanese' : 'English'}
               </span>
-              <h2 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight break-words pr-4">
+              <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight break-words pr-4">
                 {item.word}
               </h2>
             </div>
@@ -64,7 +64,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
           <div className="flex-1 overflow-y-auto pr-2 custom-card-scrollbar space-y-6">
             {/* Meaning Section */}
             <div className="mb-2">
-              <p className="text-2xl sm:text-3xl font-bold text-blue-700 leading-tight">
+              <p className="text-xl sm:text-3xl font-bold text-blue-700 leading-tight">
                 {item.translation}
               </p>
             </div>
@@ -73,7 +73,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
             {item.example && (
               <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 relative">
                 <Quote className="absolute top-3 right-4 text-slate-200" size={20} />
-                <p className="text-base sm:text-lg text-slate-700 italic font-serif leading-relaxed pr-8">
+                <p className="text-sm sm:text-lg text-slate-700 italic font-serif leading-relaxed pr-8">
                   "{item.example}"
                 </p>
               </div>
@@ -83,7 +83,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
               <div className="flex items-start space-x-3 p-5 bg-amber-50/50 rounded-2xl border border-amber-100/50">
                 <Lightbulb size={20} className="text-amber-500 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+                  <p className="text-xs sm:text-base text-slate-600 leading-relaxed">
                     {item.notes}
                   </p>
                 </div>
@@ -110,7 +110,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
       </div>
 
       {/* Mobile Navigation Controls */}
-      <div className="mt-6 flex sm:hidden justify-between items-center">
+      <div className="mt-4 flex sm:hidden justify-between items-center px-2">
         <button
           disabled={isFirst}
           onClick={onPrev}
@@ -119,7 +119,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
           <ChevronLeft size={24} />
         </button>
         <div className="bg-slate-100 px-4 py-2 rounded-full text-slate-500 font-bold text-xs">
-          {item.id} / {item.id ? '...' : '-'}
+          {item.id}
         </div>
         <button
           disabled={isLast}

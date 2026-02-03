@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AppState, WordItem, ViewMode, SheetConfig } from './types.ts';
 import WordCard from './components/WordCard.tsx';
 import WordList from './components/WordList.tsx';
@@ -60,6 +60,11 @@ const App: React.FC = () => {
   const [jsonInput, setJsonInput] = useState('');
   const [copyFeedback, setCopyFeedback] = useState(false);
 
+  // Derive current sheet based on state.currentSheetGid
+  const currentSheet = useMemo(() => {
+    return state.sheets.find(s => s.gid === state.currentSheetGid) || state.sheets[0];
+  }, [state.sheets, state.currentSheetGid]);
+
   // Initialize App
   useEffect(() => {
     const checkApiKey = async () => {
@@ -96,14 +101,15 @@ const App: React.FC = () => {
     setInputUrl(`https://docs.google.com/spreadsheets/d/${targetId}/edit`);
     setTempSheets(sanitizedSheets);
 
+    const initialGid = sanitizedSheets[0]?.gid || '0';
     setState(prev => ({
       ...prev,
       spreadsheetId: targetId,
       sheets: sanitizedSheets,
-      currentSheetGid: sanitizedSheets[0]?.gid || '0'
+      currentSheetGid: initialGid
     }));
 
-    fetchSheetData(targetId, sanitizedSheets[0]?.gid || '0');
+    fetchSheetData(targetId, initialGid);
   }, []);
 
   const fetchSheetData = async (id: string, gid: string) => {
@@ -229,7 +235,6 @@ const App: React.FC = () => {
   };
 
   const currentWord = state.words[state.currentIndex];
-  const currentSheet = state.sheets.find(s => s.gid === state.currentSheetGid);
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden relative font-sans">
@@ -321,7 +326,7 @@ const App: React.FC = () => {
                         <Hash size={14} className={state.currentSheetGid === sheet.gid ? 'text-blue-600' : 'text-slate-400'} />
                         <div className="flex-1 truncate flex flex-col">
                           <span>{sheet.name}</span>
-                          <span className="text-[10px] opacity-60 uppercase font-bold">{sheet.lang === 'zh-TW' ? 'Chinese (TW)' : 'English'}</span>
+                          <span className="text-[10px] opacity-60 uppercase font-bold">{sheet.lang === 'zh-TW' ? 'CHINESE (TW)' : 'ENGLISH'}</span>
                         </div>
                         {state.currentSheetGid === sheet.gid && <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
                       </button>
@@ -343,7 +348,7 @@ const App: React.FC = () => {
         </header>
 
         <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative">
-          <div className="flex-1 flex flex-col items-center justify-start lg:justify-center bg-slate-50/50 overflow-y-auto p-4 sm:p-8 pt-24 sm:pt-12 pb-32 lg:pb-8">
+          <div className="flex-1 flex flex-col items-center justify-start lg:justify-center bg-slate-50/50 overflow-y-auto p-4 sm:p-8 pt-28 sm:pt-12 pb-32 lg:pb-8">
             {state.isLoading ? (
               <div className="text-center animate-pulse py-20">
                 <Loader2 className="mx-auto text-blue-500 animate-spin mb-4" size={48} />
@@ -384,9 +389,9 @@ const App: React.FC = () => {
             {currentWord && <GeminiAssistant key={currentWord.id + currentWord.word} currentWord={currentWord} />}
           </div>
 
-          {/* Floating Assistant Button (Mobile) */}
+          {/* Floating Assistant Button (Mobile) - Moved higher to avoid nav overlap */}
           {state.viewMode === 'card' && currentWord && !isAssistantOpenMobile && (
-            <button onClick={() => setIsAssistantOpenMobile(true)} className="lg:hidden fixed right-6 bottom-6 bg-blue-600 text-white p-4 rounded-full shadow-2xl z-40 border-4 border-white active:scale-90 transition-transform">
+            <button onClick={() => setIsAssistantOpenMobile(true)} className="lg:hidden fixed right-6 bottom-24 bg-blue-600 text-white p-4 rounded-full shadow-2xl z-40 border-4 border-white active:scale-90 transition-transform">
               <MessageSquare size={24} />
             </button>
           )}
