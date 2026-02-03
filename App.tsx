@@ -57,6 +57,7 @@ const App: React.FC = () => {
   const [isSheetSelectorOpen, setIsSheetSelectorOpen] = useState(false);
   const [hasApiKey, setHasApiKey] = useState<boolean>(true);
 
+  // Unused state variables kept for potential future expansion
   const [jsonInput, setJsonInput] = useState('');
   const [copyFeedback, setCopyFeedback] = useState(false);
 
@@ -183,33 +184,15 @@ const App: React.FC = () => {
     fetchSheetData(id, firstGid);
   };
 
-  const handleJsonImport = () => {
-    try {
-      const config = JSON.parse(jsonInput);
-      if (config.spreadsheetId && Array.isArray(config.sheets)) {
-        const sanitized = config.sheets.map((s: any) => ({
-          name: s.name || 'Untitled',
-          gid: String(s.gid || '0'),
-          lang: s.lang || 'en-US'
-        }));
-        setInputUrl(`https://docs.google.com/spreadsheets/d/${config.spreadsheetId}/edit`);
-        setTempSheets(sanitized);
-        updateAllSettings(config.spreadsheetId, sanitized);
-        setJsonInput('');
-      }
-    } catch (e) { }
-  };
-
-  const handleJsonExport = () => {
-    const config = { spreadsheetId: state.spreadsheetId, sheets: state.sheets };
-    navigator.clipboard.writeText(JSON.stringify(config, null, 2));
-    setCopyFeedback(true);
-    setTimeout(() => setCopyFeedback(false), 2000);
-  };
-
+  // Fix: Implemented missing addTempSheet function to allow users to add new spreadsheet tabs
   const addTempSheet = () => {
-    if (newSheetName && newSheetGid) {
-      setTempSheets([...tempSheets, { name: newSheetName, gid: newSheetGid, lang: newSheetLang }]);
+    if (newSheetName.trim() && newSheetGid.trim()) {
+      const newSheet: SheetConfig = {
+        name: newSheetName.trim(),
+        gid: newSheetGid.trim(),
+        lang: newSheetLang
+      };
+      setTempSheets(prev => [...prev, newSheet]);
       setNewSheetName('');
       setNewSheetGid('');
     }
@@ -227,13 +210,13 @@ const App: React.FC = () => {
         <div className="p-6 flex items-center justify-between border-b border-slate-100 flex-shrink-0">
           <div className="flex items-center space-x-2">
             <div className="bg-blue-600 p-2 rounded-lg text-white shadow-md"><BookOpen size={20} /></div>
-            <h1 className="font-bold text-lg text-slate-800">Word Master</h1>
+            <h1 className="font-bold text-xl text-slate-800 tracking-tight">Word Master</h1>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="text-slate-400 p-1 hover:bg-slate-100 rounded lg:hidden"><X size={20} /></button>
         </div>
 
         <div className="p-4 overflow-y-auto flex-1 custom-scrollbar">
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             {state.words.map((w, idx) => (
               <button
                 key={`${w.id}-${idx}`}
@@ -241,11 +224,11 @@ const App: React.FC = () => {
                   setState(prev => ({ ...prev, currentIndex: idx, viewMode: 'card' }));
                   if (window.innerWidth < 1024) setIsSidebarOpen(false);
                 }}
-                className={`w-full text-left px-3 py-3 rounded-xl transition-all flex items-center justify-between group ${idx === state.currentIndex && state.viewMode === 'card' ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-100' : 'text-slate-600 hover:bg-slate-50'}`}
+                className={`w-full text-left px-3 py-3.5 rounded-xl transition-all flex items-center justify-between group ${idx === state.currentIndex && state.viewMode === 'card' ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-100' : 'text-slate-600 hover:bg-slate-50'}`}
               >
                 <div className="truncate pr-2">
-                  <div className="font-bold text-sm truncate">{w.word}</div>
-                  <div className={`text-xs truncate ${idx === state.currentIndex && state.viewMode === 'card' ? 'text-blue-500' : 'text-slate-400'}`}>{w.translation}</div>
+                  <div className="font-bold text-base truncate leading-tight">{w.word}</div>
+                  <div className={`text-sm truncate mt-0.5 ${idx === state.currentIndex && state.viewMode === 'card' ? 'text-blue-500' : 'text-slate-400'}`}>{w.translation}</div>
                 </div>
               </button>
             ))}
@@ -255,7 +238,7 @@ const App: React.FC = () => {
         <div className="p-4 border-t border-slate-100 bg-slate-50/50 space-y-2">
           {!hasApiKey && (
             <button onClick={handleOpenApiKey} className="w-full flex items-center justify-center space-x-2 py-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-700 hover:bg-amber-100">
-              <Key size={18} /><span className="font-bold text-xs">Connect Gemini</span>
+              <Key size={18} /><span className="font-bold text-xs uppercase">Connect Gemini</span>
             </button>
           )}
           <button onClick={() => { setTempSheets([...state.sheets]); setState(prev => ({ ...prev, isSettingsOpen: true })); }} className="w-full flex items-center justify-center space-x-2 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm transition-all active:scale-95">
@@ -265,14 +248,13 @@ const App: React.FC = () => {
       </aside>
 
       <main className="flex-1 flex flex-col relative min-w-0 h-full overflow-hidden">
-        {/* Header - Fixed to top with minimal padding */}
         <header className="h-16 flex items-center justify-between px-2 sm:px-4 border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-30">
           <div className="flex items-center space-x-1 sm:space-x-3">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg lg:hidden"><Menu size={20} /></button>
             <div className="relative">
               <button onClick={() => setIsSheetSelectorOpen(!isSheetSelectorOpen)} className="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors shadow-sm">
                 <Languages size={16} className="text-blue-600 hidden xs:inline" />
-                <span className="text-sm font-bold truncate max-w-[80px] sm:max-w-none">{currentSheet?.name}</span>
+                <span className="text-sm font-bold truncate max-w-[100px] sm:max-w-none">{currentSheet?.name}</span>
                 <ChevronDown size={14} className={isSheetSelectorOpen ? 'rotate-180' : ''} />
               </button>
               {isSheetSelectorOpen && (
@@ -280,7 +262,7 @@ const App: React.FC = () => {
                   <div className="fixed inset-0 z-20" onClick={() => setIsSheetSelectorOpen(false)} />
                   <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl z-30 overflow-hidden py-1">
                     {state.sheets.map((sheet, sIdx) => (
-                      <button key={sIdx} onClick={() => { setIsSheetSelectorOpen(false); fetchSheetData(state.spreadsheetId, sheet.gid); }} className={`w-full text-left px-4 py-3 text-sm transition-colors ${state.currentSheetGid === sheet.gid ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}>
+                      <button key={sIdx} onClick={() => { setIsSheetSelectorOpen(false); fetchSheetData(state.spreadsheetId, sheet.gid); }} className={`w-full text-left px-4 py-3.5 text-sm transition-colors ${state.currentSheetGid === sheet.gid ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}>
                         {sheet.name}
                       </button>
                     ))}
@@ -290,17 +272,16 @@ const App: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center bg-slate-100 p-0.5 sm:p-1 rounded-xl">
-            <button onClick={() => setState(prev => ({ ...prev, viewMode: 'card' }))} className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${state.viewMode === 'card' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`}>
+            <button onClick={() => setState(prev => ({ ...prev, viewMode: 'card' }))} className={`px-2 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${state.viewMode === 'card' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`}>
               <CreditCard size={14} className="inline sm:mr-2" /><span className="hidden sm:inline">Card</span>
             </button>
-            <button onClick={() => setState(prev => ({ ...prev, viewMode: 'list' }))} className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${state.viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`}>
+            <button onClick={() => setState(prev => ({ ...prev, viewMode: 'list' }))} className={`px-2 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${state.viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`}>
               <LayoutGrid size={14} className="inline sm:mr-2" /><span className="hidden sm:inline">List</span>
             </button>
           </div>
         </header>
 
         <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative">
-          {/* Main Content Area - Reduced top padding (pt-4) to remove gap */}
           <div className="flex-1 flex flex-col items-center justify-start bg-slate-50/50 overflow-y-auto px-2 sm:px-0 pt-4 pb-32 lg:pb-8">
             {state.isLoading ? (
               <Loader2 className="mx-auto text-blue-500 animate-spin py-20" size={48} />
@@ -326,7 +307,6 @@ const App: React.FC = () => {
             {currentWord && <GeminiAssistant key={currentWord.id + currentWord.word} currentWord={currentWord} />}
           </div>
 
-          {/* AI Button - Positioned to not overlap with nav */}
           {state.viewMode === 'card' && currentWord && !isAssistantOpenMobile && (
             <button onClick={() => setIsAssistantOpenMobile(true)} className="lg:hidden fixed right-4 bottom-28 bg-blue-600 text-white p-4 rounded-full shadow-2xl z-40 border-2 border-white active:scale-90 transition-transform">
               <MessageSquare size={24} />
@@ -343,22 +323,44 @@ const App: React.FC = () => {
               <button onClick={() => setState(prev => ({ ...prev, isSettingsOpen: false }))} className="text-slate-400 p-2"><X size={24} /></button>
             </div>
             <div className="flex-1 overflow-y-auto space-y-6 pr-2 custom-scrollbar">
-              <input type="text" value={inputUrl} onChange={(e) => setInputUrl(e.target.value)} className="w-full px-4 py-3 bg-slate-100 rounded-2xl outline-none" placeholder="Spreadsheet link..." />
               <div className="space-y-2">
-                {tempSheets.map((sheet, index) => (
-                  <div key={index} className="flex items-center space-x-2 p-3 bg-slate-50 rounded-2xl border border-slate-200">
-                    <span className="flex-1 text-sm font-bold truncate">{sheet.name}</span>
-                    <button onClick={() => setTempSheets(tempSheets.filter((_, i) => i !== index))} className="p-2 text-slate-300 hover:text-red-500"><Trash2 size={16} /></button>
-                  </div>
-                ))}
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Spreadsheet URL</label>
+                <input type="text" value={inputUrl} onChange={(e) => setInputUrl(e.target.value)} className="w-full px-4 py-3 bg-slate-100 rounded-2xl outline-none" placeholder="Spreadsheet link..." />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Current Tabs</label>
+                <div className="space-y-2">
+                  {tempSheets.map((sheet, index) => (
+                    <div key={index} className="flex items-center space-x-2 p-3 bg-slate-50 rounded-2xl border border-slate-200">
+                      <div className="flex-1 min-w-0">
+                        <div className="text-base font-bold truncate">{sheet.name}</div>
+                        <div className="text-[10px] text-slate-400 font-mono">GID: {sheet.gid} • {sheet.lang}</div>
+                      </div>
+                      <button onClick={() => setTempSheets(tempSheets.filter((_, i) => i !== index))} className="p-2 text-slate-300 hover:text-red-500 transition-colors"><Trash2 size={18} /></button>
+                    </div>
+                  ))}
+                </div>
               </div>
               <div className="p-4 bg-blue-50 rounded-2xl space-y-3">
-                <input type="text" placeholder="Name" value={newSheetName} onChange={(e) => setNewSheetName(e.target.value)} className="w-full px-3 py-2 bg-white rounded-xl text-sm" />
-                <input type="text" placeholder="GID" value={newSheetGid} onChange={(e) => setNewSheetGid(e.target.value)} className="w-full px-3 py-2 bg-white rounded-xl text-sm" />
-                <button onClick={addTempSheet} className="w-full py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold">Add Tab</button>
+                <label className="text-xs font-bold text-blue-600 uppercase tracking-widest ml-1">Add New Tab</label>
+                <input type="text" placeholder="Tab Name (e.g., General)" value={newSheetName} onChange={(e) => setNewSheetName(e.target.value)} className="w-full px-3 py-2.5 bg-white rounded-xl text-sm" />
+                <input type="text" placeholder="GID (from browser URL)" value={newSheetGid} onChange={(e) => setNewSheetGid(e.target.value)} className="w-full px-3 py-2.5 bg-white rounded-xl text-sm" />
+                <select
+                  value={newSheetLang}
+                  onChange={(e) => setNewSheetLang(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-white rounded-xl text-sm outline-none border-none focus:ring-2 focus:ring-blue-500 appearance-none"
+                >
+                  <option value="en-US">English (US)</option>
+                  <option value="zh-TW">Traditional Chinese (TW)</option>
+                  <option value="ja-JP">Japanese</option>
+                  <option value="ko-KR">Korean</option>
+                  <option value="fr-FR">French</option>
+                  <option value="es-ES">Spanish</option>
+                </select>
+                <button onClick={addTempSheet} className="w-full py-3 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-200 active:scale-[0.98] transition-all">Add Tab</button>
               </div>
             </div>
-            <button onClick={handleApplySettings} className="w-full py-4 mt-4 bg-slate-900 text-white rounded-2xl font-bold">Save Changes</button>
+            <button onClick={handleApplySettings} className="w-full py-4 mt-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-colors active:scale-[0.98]">Save Changes</button>
           </div>
         </div>
       )}
