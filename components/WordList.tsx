@@ -12,7 +12,7 @@ interface WordListProps {
 const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US' }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredWords = words.filter(w =>
+  const filteredWords = words.filter(w => 
     w.word.toLowerCase().includes(searchTerm.toLowerCase()) ||
     w.translation.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -32,10 +32,10 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
           <h2 className="text-xl sm:text-2xl font-extrabold text-slate-800">Library</h2>
           <p className="text-slate-500 text-xs sm:text-sm">Browsing {words.length} items ({lang === 'zh-TW' ? '繁體中文' : 'English'})</p>
         </div>
-
+        
         <div className="relative w-full md:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-          <input
+          <input 
             type="text"
             placeholder="Search words..."
             value={searchTerm}
@@ -64,7 +64,7 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
                   <tr key={w.id} className="hover:bg-blue-50/40 transition-colors group">
                     <td className="px-4 py-4 text-xs text-slate-400 text-center">{idx + 1}</td>
                     <td className="px-4 py-4">
-                      <button
+                      <button 
                         onClick={() => onSelectWord(originalIndex)}
                         className="font-bold text-sm sm:text-base text-slate-800 hover:text-blue-600 transition-colors text-left"
                       >
@@ -77,14 +77,14 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
                     </td>
                     <td className="px-4 py-4 text-center">
                       <div className="flex items-center justify-center space-x-1 sm:space-x-2">
-                        <button
+                        <button 
                           onClick={() => speakWord(w.word)}
                           className="p-2 text-slate-400 hover:text-blue-600 hover:bg-slate-100 rounded-lg transition-all active:scale-90"
                           title="Listen"
                         >
                           <Volume2 size={18} />
                         </button>
-                        <button
+                        <button 
                           onClick={() => onSelectWord(originalIndex)}
                           className="p-2 text-slate-300 group-hover:text-blue-500 transition-all"
                           title="Open Card"
@@ -99,7 +99,7 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
             </tbody>
           </table>
         </div>
-
+        
         {filteredWords.length === 0 && (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
             <Search size={40} className="text-slate-200 mb-4" />

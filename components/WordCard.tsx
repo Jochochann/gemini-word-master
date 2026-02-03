@@ -49,7 +49,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
                 {item.word}
               </h2>
             </div>
-            <button
+            <button 
               onClick={handleManualSpeak}
               className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-95 flex-shrink-0"
               title="Speak"

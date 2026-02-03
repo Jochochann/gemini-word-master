@@ -43,7 +43,7 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
     try {
       let fullResponse = '';
       const stream = streamAssistantResponse(
-        currentWord.word,
+        currentWord.word, 
         currentWord.translation,
         finalInput
       );
@@ -63,7 +63,7 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
       console.error(e);
       let errorMessage = 'エラーが発生しました。';
       const isAuthError = e.message?.includes('leaked') || e.message?.includes('403') || e.message?.includes('PERMISSION_DENIED');
-
+      
       if (isAuthError) {
         errorMessage = 'APIキーが無効、または漏洩の可能性があります。新しいキーを選択してください。';
         setNeedsApiKey(true);
@@ -71,7 +71,7 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
         errorMessage = 'APIキーまたはプロジェクトが見つかりません。';
         setNeedsApiKey(true);
       }
-
+      
       setError(errorMessage);
       setMessages(prev => {
         if (prev.length > 0 && prev[prev.length - 1].role === 'model' && !prev[prev.length - 1].text) {
@@ -113,10 +113,11 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
 
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[90%] rounded-2xl p-3 text-sm flex space-x-2 ${msg.role === 'user'
-                ? 'bg-blue-600 text-white shadow-md'
+            <div className={`max-w-[90%] rounded-2xl p-3 text-sm flex space-x-2 ${
+              msg.role === 'user' 
+                ? 'bg-blue-600 text-white shadow-md' 
                 : 'bg-slate-100 text-slate-800 border border-slate-200 shadow-sm'
-              }`}>
+            }`}>
               <div className="mt-1 flex-shrink-0">
                 {msg.role === 'user' ? <User size={14} /> : <Bot size={14} className="text-blue-500" />}
               </div>
@@ -134,7 +135,7 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
               <span>{error}</span>
             </div>
             {needsApiKey && (
-              <button
+              <button 
                 onClick={handleOpenApiKey}
                 className="w-full flex items-center justify-center space-x-2 py-2.5 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 shadow-lg active:scale-95 transition-all"
               >
@@ -145,7 +146,7 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
           </div>
         )}
 
-        {isTyping && messages[messages.length - 1]?.role === 'user' && (
+        {isTyping && messages[messages.length-1]?.role === 'user' && (
           <div className="flex justify-start">
             <div className="bg-slate-100 rounded-2xl p-3 text-sm flex items-center space-x-2">
               <Loader2 size={14} className="animate-spin text-blue-500" />
@@ -189,8 +190,9 @@ const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
           <button
             onClick={() => handleSend()}
             disabled={!input.trim() || isTyping}
-            className={`absolute right-2 bottom-2 p-2 rounded-xl transition-all active:scale-90 ${input.trim() && !isTyping ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'
-              }`}
+            className={`absolute right-2 bottom-2 p-2 rounded-xl transition-all active:scale-90 ${
+              input.trim() && !isTyping ? 'bg-blue-600 text-white shadow-lg' : 'text-slate-400'
+            }`}
           >
             <Send size={20} />
           </button>
