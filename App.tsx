@@ -4,12 +4,12 @@ import { AppState, WordItem, ViewMode, SheetConfig } from './types.ts';
 import WordCard from './components/WordCard.tsx';
 import WordList from './components/WordList.tsx';
 import GeminiAssistant from './components/GeminiAssistant.tsx';
-import { 
-  Database, 
-  Settings, 
-  Loader2, 
-  BookOpen, 
-  Menu, 
+import {
+  Database,
+  Settings,
+  Loader2,
+  BookOpen,
+  Menu,
   X,
   Plus,
   Layers,
@@ -28,8 +28,9 @@ import {
 
 const DEFAULT_SHEET_ID = '1Ul94nfm4HbnoIeUyElhBXC6gPOsbbU-nsDjkzoY_gPU';
 const DEFAULT_SHEETS: SheetConfig[] = [
-  { name: 'English Basic', gid: '420352437', lang: 'en-US' },
-  { name: 'Business English', gid: '0', lang: 'en-US' }
+  { name: 'GoFluent', gid: '420352437', lang: 'en-US' },
+  { name: 'Atsueigo', gid: '0', lang: 'en-US' }
+  { name: '台湾華語', gid: '0', lang: 'zh-TW' }
 ];
 
 const App: React.FC = () => {
@@ -49,11 +50,11 @@ const App: React.FC = () => {
   const [newSheetGid, setNewSheetGid] = useState('');
   const [newSheetLang, setNewSheetLang] = useState('en-US');
   const [tempSheets, setTempSheets] = useState<SheetConfig[]>([]);
-  
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAssistantOpenMobile, setIsAssistantOpenMobile] = useState(false);
   const [isSheetSelectorOpen, setIsSheetSelectorOpen] = useState(false);
-  
+
   const [jsonInput, setJsonInput] = useState('');
   const [copyFeedback, setCopyFeedback] = useState(false);
 
@@ -64,18 +65,18 @@ const App: React.FC = () => {
 
     const savedId = localStorage.getItem('gemini_word_master_sheet_id');
     const savedSheets = localStorage.getItem('gemini_word_master_sheets');
-    
+
     const targetId = savedId || DEFAULT_SHEET_ID;
     const targetSheets: SheetConfig[] = savedSheets ? JSON.parse(savedSheets) : DEFAULT_SHEETS;
-    
+
     const sanitizedSheets = targetSheets.map(s => ({ ...s, lang: s.lang || 'en-US' }));
-    
+
     setInputUrl(`https://docs.google.com/spreadsheets/d/${targetId}/edit`);
     setTempSheets(sanitizedSheets);
-    
-    setState(prev => ({ 
-      ...prev, 
-      spreadsheetId: targetId, 
+
+    setState(prev => ({
+      ...prev,
+      spreadsheetId: targetId,
       sheets: sanitizedSheets,
       currentSheetGid: sanitizedSheets[0]?.gid || '0'
     }));
@@ -86,7 +87,7 @@ const App: React.FC = () => {
   const fetchSheetData = async (id: string, gid: string) => {
     if (!id) return;
     setState(prev => ({ ...prev, isLoading: true, currentSheetGid: gid }));
-    
+
     try {
       let url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv`;
       if (gid && gid !== '0') {
@@ -96,7 +97,7 @@ const App: React.FC = () => {
       const response = await fetch(url);
       if (!response.ok) throw new Error(`Failed to fetch sheet`);
       const csvText = await response.text();
-      
+
       const lines = csvText.split('\n');
       const words: WordItem[] = lines.slice(1).map((line, idx) => {
         const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
@@ -109,9 +110,9 @@ const App: React.FC = () => {
         };
       }).filter(w => w.word !== '');
 
-      setState(prev => ({ 
-        ...prev, 
-        words, 
+      setState(prev => ({
+        ...prev,
+        words,
         currentIndex: 0,
         isLoading: false
       }));
@@ -125,7 +126,7 @@ const App: React.FC = () => {
   const handleApplySettings = (e: React.FormEvent) => {
     e.preventDefault();
     let id = '';
-    
+
     if (inputUrl.includes('docs.google.com/spreadsheets')) {
       const idMatch = inputUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
       if (idMatch) id = idMatch[1];
@@ -142,10 +143,10 @@ const App: React.FC = () => {
 
   const updateAllSettings = (id: string, sheets: SheetConfig[]) => {
     const firstGid = sheets[0]?.gid || '0';
-    setState(prev => ({ 
-      ...prev, 
-      spreadsheetId: id, 
-      sheets: sheets, 
+    setState(prev => ({
+      ...prev,
+      spreadsheetId: id,
+      sheets: sheets,
       isSettingsOpen: false,
       currentSheetGid: firstGid
     }));
@@ -217,7 +218,7 @@ const App: React.FC = () => {
           <div className="flex items-center justify-between mb-4 px-2">
             <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Words in {currentSheet?.name} ({state.words.length})</h2>
           </div>
-          
+
           <div className="space-y-1">
             {state.words.map((w, idx) => (
               <button
@@ -249,9 +250,9 @@ const App: React.FC = () => {
         <header className="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-10">
           <div className="flex items-center space-x-3">
             <button onClick={() => setIsSidebarOpen(true)} className={`p-2 text-slate-500 hover:bg-slate-100 rounded-lg lg:hidden ${isSidebarOpen ? 'invisible' : 'visible'}`}><Menu size={20} /></button>
-            
+
             <div className="relative">
-              <button 
+              <button
                 onClick={() => setIsSheetSelectorOpen(!isSheetSelectorOpen)}
                 className="flex items-center space-x-2 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors"
               >
@@ -286,7 +287,7 @@ const App: React.FC = () => {
               )}
             </div>
           </div>
-          
+
           <div className="flex items-center bg-slate-100 p-1 rounded-xl">
             <button onClick={() => setState(prev => ({ ...prev, viewMode: 'card' }))} className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${state.viewMode === 'card' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
               <CreditCard size={14} /><span className="hidden xs:inline">Card</span>
@@ -307,13 +308,13 @@ const App: React.FC = () => {
             ) : state.viewMode === 'card' ? (
               currentWord ? (
                 <div className="w-full flex justify-center py-4">
-                  <WordCard 
-                    item={currentWord} 
+                  <WordCard
+                    item={currentWord}
                     lang={currentSheet?.lang}
-                    onNext={() => setState(prev => ({ ...prev, currentIndex: Math.min(prev.words.length - 1, prev.currentIndex + 1) }))} 
-                    onPrev={() => setState(prev => ({ ...prev, currentIndex: Math.max(0, prev.currentIndex - 1) }))} 
-                    isFirst={state.currentIndex === 0} 
-                    isLast={state.currentIndex === state.words.length - 1} 
+                    onNext={() => setState(prev => ({ ...prev, currentIndex: Math.min(prev.words.length - 1, prev.currentIndex + 1) }))}
+                    onPrev={() => setState(prev => ({ ...prev, currentIndex: Math.max(0, prev.currentIndex - 1) }))}
+                    isFirst={state.currentIndex === 0}
+                    isLast={state.currentIndex === state.words.length - 1}
                   />
                 </div>
               ) : (
@@ -379,7 +380,7 @@ const App: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase flex-shrink-0">Language:</label>
-                    <select 
+                    <select
                       value={newSheetLang}
                       onChange={(e) => setNewSheetLang(e.target.value)}
                       className="flex-1 px-3 py-2 bg-white rounded-xl text-sm border-none outline-none ring-1 ring-blue-100"
@@ -400,7 +401,7 @@ const App: React.FC = () => {
                   <label className="text-xs font-bold text-slate-400 uppercase flex items-center space-x-2">
                     <FileJson size={14} /><span>JSON Config (Backup/Share)</span>
                   </label>
-                  <button 
+                  <button
                     onClick={handleJsonExport}
                     className="flex items-center space-x-1 text-[10px] font-bold text-blue-600 hover:text-blue-700 transition-colors uppercase"
                   >
@@ -408,16 +409,16 @@ const App: React.FC = () => {
                     <span>{copyFeedback ? 'Copied!' : 'Copy to Clipboard'}</span>
                   </button>
                 </div>
-                
+
                 <div className="relative group">
-                  <textarea 
+                  <textarea
                     value={jsonInput}
                     onChange={(e) => setJsonInput(e.target.value)}
                     placeholder='Paste configuration JSON here to import...'
                     className="w-full h-24 p-4 bg-slate-50 border border-slate-200 rounded-2xl text-[10px] font-mono outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
                   />
                   {jsonInput && (
-                    <button 
+                    <button
                       onClick={handleJsonImport}
                       className="absolute bottom-3 right-3 flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-[10px] font-bold shadow-lg hover:bg-blue-700 transition-all"
                     >
