@@ -1,0 +1,7 @@
+{
+  "name": "Gemini Word Master",
+  "description": "An interactive English vocabulary learning app that synchronizes with Google Spreadsheets and utilizes Gemini AI for deep contextual understanding and practice.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
