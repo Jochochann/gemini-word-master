@@ -26,7 +26,8 @@ import {
   AlertCircle,
   Key,
   Home,
-  Play
+  Play,
+  Search
 } from 'lucide-react';
 
 const DEFAULT_SHEET_ID = '1Ul94nfm4HbnoIeUyElhBXC6gPOsbbU-nsDjkzoY_gPU';
@@ -267,11 +268,6 @@ const App: React.FC = () => {
         </div>
 
         <div className="p-4 border-t border-slate-100 bg-slate-50/50 space-y-2">
-          {!hasApiKey && (
-            <button onClick={handleOpenApiKey} className="w-full flex items-center justify-center space-x-2 py-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-700 hover:bg-amber-100">
-              <Key size={18} /><span className="font-bold text-xs uppercase">Connect Gemini</span>
-            </button>
-          )}
           <button onClick={() => { setTempSheets([...state.sheets]); setState(prev => ({ ...prev, isSettingsOpen: true })); }} className="w-full flex items-center justify-center space-x-2 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 shadow-sm transition-all active:scale-95">
             <Settings size={18} /><span className="font-bold text-xs uppercase tracking-wider">Settings</span>
           </button>
@@ -333,15 +329,15 @@ const App: React.FC = () => {
 
           <div className={`fixed inset-0 z-50 lg:relative lg:inset-auto lg:z-0 lg:w-96 bg-white transition-transform duration-300 ${state.viewMode === 'card' && currentWord ? 'block' : 'hidden'} ${isAssistantOpenMobile ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'} lg:block lg:border-l lg:border-slate-200`}>
             <div className="lg:hidden flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50">
-              <span className="font-bold text-slate-700">Gemini Tutor</span>
+              <span className="font-bold text-slate-700">辞書・検索</span>
               <button onClick={() => setIsAssistantOpenMobile(false)} className="p-2 text-slate-400"><X size={24} /></button>
             </div>
-            {currentWord && <GeminiAssistant key={currentWord.id + currentWord.word} currentWord={currentWord} />}
+            {currentWord && <GeminiAssistant key={currentWord.id + currentWord.word} currentWord={currentWord} lang={currentSheet?.lang} />}
           </div>
 
           {state.viewMode === 'card' && currentWord && !isAssistantOpenMobile && (
             <button onClick={() => setIsAssistantOpenMobile(true)} className="lg:hidden fixed right-4 bottom-28 bg-blue-600 text-white p-4 rounded-full shadow-2xl z-40 border-2 border-white active:scale-90 transition-transform">
-              <MessageSquare size={24} />
+              <Search size={24} />
             </button>
           )}
         </div>

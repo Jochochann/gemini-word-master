@@ -1,205 +1,164 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { askAboutWord, streamAssistantResponse } from '../services/geminiService';
-import { WordItem, ChatMessage } from '../types';
-import { Send, Bot, User, Sparkles, Loader2, Key, AlertCircle } from 'lucide-react';
+import React from 'react';
+import { WordItem } from '../types';
+import {
+  Search,
+  ExternalLink,
+  Image as ImageIcon,
+  Book,
+  Globe,
+  MessageSquare,
+  Languages,
+  BookOpen,
+  HelpCircle
+} from 'lucide-react';
 
-interface GeminiAssistantProps {
+interface SearchAssistantProps {
   currentWord: WordItem;
+  lang?: string;
 }
 
-const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ currentWord }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [needsApiKey, setNeedsApiKey] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+const GeminiAssistant: React.FC<SearchAssistantProps> = ({ currentWord, lang = 'en-US' }) => {
+  const { word } = currentWord;
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages, isTyping]);
-
-  const handleOpenApiKey = async () => {
-    if (window.aistudio?.openSelectKey) {
-      await window.aistudio.openSelectKey();
-      setError(null);
-      setNeedsApiKey(false);
-    }
+  const openSearch = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
-  const handleSend = async (customInput?: string) => {
-    const finalInput = customInput || input;
-    if (!finalInput.trim() || isTyping) return;
+  const getSearchResources = () => {
+    const encodedWord = encodeURIComponent(word);
 
-    setInput('');
-    setError(null);
-    setNeedsApiKey(false);
-    setMessages(prev => [...prev, { role: 'user', text: finalInput }]);
-    setIsTyping(true);
-
-    try {
-      let fullResponse = '';
-      const stream = streamAssistantResponse(
-        currentWord.word,
-        currentWord.translation,
-        finalInput
-      );
-
-      // Add placeholder message for model
-      setMessages(prev => [...prev, { role: 'model', text: '' }]);
-
-      for await (const chunk of stream) {
-        fullResponse += chunk;
-        setMessages(prev => {
-          const newMessages = [...prev];
-          newMessages[newMessages.length - 1].text = fullResponse;
-          return newMessages;
-        });
+    // Start with a generic search resource
+    const resources = [
+      {
+        id: 'google',
+        name: 'Google 検索',
+        icon: <Search className="text-blue-500" />,
+        url: `https://www.google.com/search?q=${encodedWord}+meaning+japanese`,
+        description: 'Googleで一般的な意味や使い方を調べる'
       }
-    } catch (e: any) {
-      console.error(e);
-      let errorMessage = 'エラーが発生しました。';
-      const isAuthError = e.message?.includes('leaked') || e.message?.includes('403') || e.message?.includes('PERMISSION_DENIED');
+    ];
 
-      if (isAuthError) {
-        errorMessage = 'APIキーが無効、または漏洩の可能性があります。新しいキーを選択してください。';
-        setNeedsApiKey(true);
-      } else if (e.message?.includes('entity was not found')) {
-        errorMessage = 'APIキーまたはプロジェクトが見つかりません。';
-        setNeedsApiKey(true);
-      }
-
-      setError(errorMessage);
-      setMessages(prev => {
-        if (prev.length > 0 && prev[prev.length - 1].role === 'model' && !prev[prev.length - 1].text) {
-          return prev.slice(0, -1);
+    if (lang === 'zh-TW') {
+      // Traditional Chinese specific resources
+      resources.push(
+        {
+          id: 'moedict',
+          name: '萌典 (MoeDict)',
+          icon: <Book className="text-red-500" />,
+          url: `https://www.moedict.tw/${encodedWord}`,
+          description: '台湾華語の標準的な辞書'
+        },
+        {
+          id: 'images',
+          name: '画像検索',
+          icon: <ImageIcon className="text-purple-500" />,
+          url: `https://www.google.com/search?tbm=isch&q=${encodedWord}`,
+          description: '画像で視覚的なイメージを掴む'
+        },
+        {
+          id: 'google-zh',
+          name: 'Google 台湾',
+          icon: <Globe className="text-green-500" />,
+          url: `https://www.google.com.tw/search?q=${encodedWord}+意思`,
+          description: '台湾のサイトから用例を探す'
         }
-        return prev;
-      });
-    } finally {
-      setIsTyping(false);
+      );
+    } else {
+      // English specific - YouGlish moved to 2nd position
+      resources.push(
+        {
+          id: 'youglish',
+          name: 'YouGlish',
+          icon: <MessageSquare className="text-red-600" />,
+          url: `https://youglish.com/pronounce/${encodedWord}/english`,
+          description: 'YouTubeのリアルな発音を聞く'
+        },
+        {
+          id: 'images',
+          name: '画像検索',
+          icon: <ImageIcon className="text-purple-500" />,
+          url: `https://www.google.com/search?tbm=isch&q=${encodedWord}`,
+          description: '画像で視覚的なイメージを掴む'
+        },
+        {
+          id: 'weblio',
+          name: 'Weblio 英和辞典',
+          icon: <Book className="text-blue-600" />,
+          url: `https://ejje.weblio.jp/content/${encodedWord}`,
+          description: '詳しい和訳と例文を確認する'
+        },
+        {
+          id: 'cambridge',
+          name: 'Cambridge Dict',
+          icon: <Languages className="text-orange-500" />,
+          url: `https://dictionary.cambridge.org/dictionary/english/${encodedWord}`,
+          description: '英英辞典で正確な定義を確認する'
+        }
+      );
     }
+
+    return resources;
   };
 
-  const quickQuestions = [
-    "例文を3つ作って",
-    "類義語との違いは？",
-    "覚え方のコツ（語源など）を教えて",
-    "ビジネスでの使い方は？"
-  ];
+  const resources = getSearchResources();
 
   return (
-    <div className="flex flex-col h-full bg-white border-l border-slate-200">
+    <div className="flex flex-col h-full bg-white border-l border-slate-200 overflow-hidden">
       <div className="p-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
         <div className="flex items-center space-x-2.5">
-          <Sparkles className="text-blue-500" size={22} />
-          <h3 className="font-bold text-lg text-slate-800 tracking-tight">Gemini 講師</h3>
+          <BookOpen className="text-blue-500" size={22} />
+          <h3 className="font-bold text-lg text-slate-800 tracking-tight">辞書・検索ツール</h3>
         </div>
-        {error && <AlertCircle className="text-red-500" size={18} />}
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-5 custom-scrollbar">
-        {messages.length === 0 && (
-          <div className="text-center py-16">
-            <Bot className="mx-auto text-slate-200 mb-5" size={72} />
-            {/* Increased font size of placeholder text */}
-            <p className="text-slate-500 text-lg leading-relaxed">
-              <span className="font-bold text-blue-600 text-2xl block mb-2">{currentWord.word}</span> について何でも聞いてください。
-            </p>
-          </div>
-        )}
+      <div className="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar">
+        <div className="mb-6 p-6 bg-blue-50 rounded-2xl border border-blue-100">
+          <span className="text-xs font-bold text-blue-500 uppercase tracking-widest block mb-2">学習中の単語</span>
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-none mb-2">{word}</h2>
+          <p className="text-xl sm:text-2xl text-blue-700 font-bold">{currentWord.translation}</p>
+        </div>
 
-        {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {/* Increased text size of messages from text-base to text-lg sm:text-xl */}
-            <div className={`max-w-[92%] rounded-2xl p-5 text-lg sm:text-xl flex space-x-3 ${msg.role === 'user'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
-                : 'bg-slate-100 text-slate-800 border border-slate-200 shadow-sm'
-              }`}>
-              <div className="mt-1.5 flex-shrink-0">
-                {msg.role === 'user' ? <User size={18} /> : <Bot size={18} className="text-blue-500" />}
-              </div>
-              <div className="whitespace-pre-wrap leading-relaxed">
-                {msg.text || (msg.role === 'model' && isTyping && i === messages.length - 1 ? <Loader2 size={20} className="animate-spin inline" /> : '')}
-              </div>
-            </div>
-          </div>
-        ))}
+        <div className="space-y-3">
+          <p className="text-base font-bold text-slate-400 uppercase tracking-widest ml-1">リソースを選択</p>
 
-        {error && (
-          <div className="p-5 bg-red-50 border border-red-100 rounded-2xl space-y-4">
-            <div className="text-red-600 text-base flex items-start space-x-2.5 font-bold">
-              <AlertCircle size={20} className="mt-0.5 flex-shrink-0" />
-              <span>{error}</span>
-            </div>
-            {needsApiKey && (
-              <button
-                onClick={handleOpenApiKey}
-                className="w-full flex items-center justify-center space-x-2 py-3 bg-red-600 text-white rounded-xl text-sm font-bold hover:bg-red-700 shadow-lg active:scale-95 transition-all"
-              >
-                <Key size={16} />
-                <span>新しいAPIキーを選択</span>
-              </button>
-            )}
-          </div>
-        )}
-
-        {isTyping && messages[messages.length - 1]?.role === 'user' && (
-          <div className="flex justify-start">
-            {/* Increased text size of typing indicator */}
-            <div className="bg-slate-50 rounded-2xl p-4 text-lg flex items-center space-x-3 border border-slate-100">
-              <Loader2 size={20} className="animate-spin text-blue-500" />
-              <span className="text-slate-500 italic font-medium">Gemini が回答を作成中...</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Persistent Quick Questions Area */}
-      <div className="px-5 py-4 bg-slate-50/50 border-t border-slate-100">
-        <div className="flex flex-wrap gap-2.5">
-          {quickQuestions.map(q => (
+          {resources.map((res) => (
             <button
-              key={q}
-              onClick={() => handleSend(q)}
-              disabled={isTyping}
-              /* Increased text size of quick question buttons slightly */
-              className="text-sm font-bold px-3.5 py-2.5 bg-white hover:bg-blue-600 text-slate-600 hover:text-white rounded-xl border border-slate-200 hover:border-blue-600 transition-all shadow-sm active:scale-95 disabled:opacity-50"
+              key={res.id}
+              onClick={() => openSearch(res.url)}
+              className="w-full text-left p-5 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl transition-all group flex items-start space-x-4 shadow-sm active:scale-[0.98]"
             >
-              {q}
+              <div className="p-3 bg-slate-50 rounded-xl group-hover:bg-white transition-colors">
+                {res.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between">
+                  <span className="text-xl font-bold text-slate-800">{res.name}</span>
+                  <ExternalLink size={18} className="text-slate-300 group-hover:text-blue-500" />
+                </div>
+                <p className="text-base text-slate-500 mt-1">{res.description}</p>
+              </div>
             </button>
           ))}
         </div>
+
+        <div className="mt-8 p-6 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+          <div className="flex items-center space-x-2 mb-3">
+            <HelpCircle size={18} className="text-slate-400" />
+            <span className="text-base font-bold text-slate-500">学習のヒント</span>
+          </div>
+          <ul className="text-base text-slate-600 space-y-2 list-disc pl-5">
+            <li>YouGlishはYouTubeから生の会話音声を探せる最強のツールです。</li>
+            <li>画像検索で「言葉のイメージ」を覚えるのが近道です。</li>
+            <li>和訳だけでなく英英辞典の定義も読むと深まります。</li>
+          </ul>
+        </div>
       </div>
 
-      <div className="p-5 pt-3 border-t border-slate-100">
-        <div className="relative">
-          <textarea
-            rows={2}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
-            placeholder="質問を入力..."
-            /* Increased text size of input area to text-lg sm:text-xl */
-            className="w-full pl-5 pr-14 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 resize-none text-lg sm:text-xl transition-all outline-none"
-          />
-          <button
-            onClick={() => handleSend()}
-            disabled={!input.trim() || isTyping}
-            className={`absolute right-3 bottom-3 p-2.5 rounded-xl transition-all active:scale-90 ${input.trim() && !isTyping ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-300'
-              }`}
-          >
-            <Send size={28} />
-          </button>
-        </div>
+      <div className="p-5 border-t border-slate-100 bg-slate-50 text-center">
+        <p className="text-sm text-slate-400 font-medium">
+          外部ブラウザで詳細情報を開きます
+        </p>
       </div>
     </div>
   );
