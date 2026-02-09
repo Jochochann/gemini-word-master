@@ -13,23 +13,63 @@ interface WordCardProps {
 }
 
 const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLast, lang = 'en-US' }) => {
-  const speakWord = (word: string) => {
+  const speakText = (text: string) => {
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(word);
+    const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
     utterance.rate = 0.85;
     window.speechSynthesis.speak(utterance);
   };
 
+  // 自動読み上げのロジック
   useEffect(() => {
+    let timeoutId: number | undefined;
+
     if (item.word) {
-      speakWord(item.word);
+      // 以前の音声を停止
+      window.speechSynthesis.cancel();
+
+      // 1. 単語/熟語の読み上げ準備
+      const wordUtterance = new SpeechSynthesisUtterance(item.word);
+      wordUtterance.lang = lang;
+      wordUtterance.rate = 0.85;
+
+      // 2. 単語の読み上げが終了した時のイベント
+      wordUtterance.onend = () => {
+        // 繁体字中国語（台湾）の場合は熟語のみを読み上げ、例文はスキップする
+        // それ以外の言語（英語など）は、単語の後に例文も自動で読み上げる
+        if (item.example && lang !== 'zh-TW') {
+          // 少し間（500ms）を置いてから例文を読み上げる
+          timeoutId = window.setTimeout(() => {
+            const exampleUtterance = new SpeechSynthesisUtterance(item.example!);
+            exampleUtterance.lang = lang;
+            exampleUtterance.rate = 0.85;
+            window.speechSynthesis.speak(exampleUtterance);
+          }, 500);
+        }
+      };
+
+      // 3. 再生開始
+      window.speechSynthesis.speak(wordUtterance);
     }
+
+    // クリーンアップ: コンポーネントが更新・アンマウントされる際にタイマーと音声をクリア
+    return () => {
+      if (timeoutId) window.clearTimeout(timeoutId);
+      window.speechSynthesis.cancel();
+    };
   }, [item.word, lang]);
 
   const handleManualSpeak = (e: React.MouseEvent) => {
     e.stopPropagation();
-    speakWord(item.word);
+    speakText(item.word);
+  };
+
+  const handleSpeakExample = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (item.example) {
+      speakText(item.example);
+    }
   };
 
   return (
@@ -48,7 +88,11 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
                 {item.word}
               </h2>
             </div>
-            <button onClick={handleManualSpeak} className="p-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg transition-all active:scale-95 flex-shrink-0 mt-1">
+            <button
+              onClick={handleManualSpeak}
+              className="p-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg transition-all active:scale-95 flex-shrink-0 mt-1"
+              title="単語を読み上げる"
+            >
               <Volume2 size={26} />
             </button>
           </div>
@@ -60,17 +104,27 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
             <p className="text-2xl sm:text-4xl font-bold text-blue-700 leading-snug">{item.translation}</p>
 
             {item.example && (
-              <div className="bg-slate-50 p-5 sm:p-7 rounded-2xl border border-slate-100 relative">
-                <Quote className="absolute top-4 right-5 text-slate-200" size={24} />
-                {/* Increased text size from text-sm sm:text-xl to text-lg sm:text-2xl */}
-                <p className="text-lg sm:text-2xl text-slate-700 italic leading-relaxed pr-10">"{item.example}"</p>
+              <div className="bg-slate-50 p-5 sm:p-7 rounded-2xl border border-slate-100 relative group">
+                <div className="flex justify-between items-start mb-2">
+                  <Quote className="text-slate-200" size={24} />
+                  {/* zh-TWの場合は、例文の読み上げボタンを非表示にする */}
+                  {lang !== 'zh-TW' && (
+                    <button
+                      onClick={handleSpeakExample}
+                      className="p-2 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl transition-all active:scale-90"
+                      title="例文を読み上げる"
+                    >
+                      <Volume2 size={20} />
+                    </button>
+                  )}
+                </div>
+                <p className="text-lg sm:text-2xl text-slate-700 italic leading-relaxed pr-2">"{item.example}"</p>
               </div>
             )}
 
             {item.notes && (
               <div className="flex items-start space-x-3.5 p-5 sm:p-7 bg-amber-50/50 rounded-2xl border border-amber-100/50">
                 <Lightbulb size={22} className="text-amber-500 mt-1 flex-shrink-0" />
-                {/* Increased text size from text-sm sm:text-lg to text-base sm:text-xl */}
                 <p className="text-base sm:text-xl text-slate-600 leading-relaxed font-medium">{item.notes}</p>
               </div>
             )}
