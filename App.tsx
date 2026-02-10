@@ -76,7 +76,7 @@ const App: React.FC = () => {
   const [isAssistantOpenMobile, setIsAssistantOpenMobile] = useState(false);
   const [isSheetSelectorOpen, setIsSheetSelectorOpen] = useState(false);
 
-  const { data: fetchedWords, isLoading: isQueryLoading, error: queryError } = useQuery<WordItem[]>({
+  const { data: fetchedWords, isLoading: isQueryLoading, error: queryError, status } = useQuery<WordItem[]>({
     queryKey: ['spreadsheet-words', state.spreadsheetId, state.currentSheetGid],
     queryFn: () => fetchSpreadsheetWords(state.spreadsheetId, state.currentSheetGid),
     enabled: !!state.spreadsheetId,
@@ -149,6 +149,8 @@ const App: React.FC = () => {
 
   const handleClearCache = () => {
     queryClient.invalidateQueries({ queryKey: ['spreadsheet-words'] });
+    // 強制的にキャッシュを破棄して再取得させる
+    queryClient.resetQueries({ queryKey: ['spreadsheet-words'] });
     alert('キャッシュをリセットしました。');
   };
 
@@ -167,6 +169,10 @@ const App: React.FC = () => {
 
   const displayWords = fetchedWords || [];
   const currentWord = displayWords[state.currentIndex];
+
+  // キャッシュデータがある場合は、isQueryLoadingがtrueでもデータを表示する
+  const isDataReady = status === 'success' || (status === 'pending' && displayWords.length > 0);
+  const showSpinner = isQueryLoading && !isDataReady;
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden relative font-sans">
@@ -192,7 +198,7 @@ const App: React.FC = () => {
               <LayoutGrid size={20} /><span className="font-bold">単語一覧</span>
             </button>
             <div className="h-px bg-slate-100 w-full my-3" />
-            {(isQueryLoading || state.isLoading) ? (
+            {showSpinner ? (
               <div className="flex justify-center py-10"><Loader2 className="animate-spin text-slate-300" /></div>
             ) : (
               displayWords.map((w, idx) => (
@@ -239,9 +245,9 @@ const App: React.FC = () => {
 
         <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative">
           <div className="flex-1 flex flex-col items-center justify-start bg-slate-50/50 overflow-y-auto pt-4 pb-32 lg:pb-8">
-            {isQueryLoading ? (
-              <div className="flex flex-col items-center py-20"><Loader2 className="text-blue-500 animate-spin mb-4" size={48} /><p className="text-slate-400">Loading...</p></div>
-            ) : queryError ? (
+            {showSpinner ? (
+              <div className="flex flex-col items-center py-20"><Loader2 className="text-blue-500 animate-spin mb-4" size={48} /><p className="text-slate-400">Loading from cloud...</p></div>
+            ) : queryError && !displayWords.length ? (
               <div className="flex flex-col items-center py-20 text-center"><AlertCircle className="text-red-500 mb-4" size={48} /><p className="text-slate-600 font-bold">Failed to load data</p></div>
             ) : state.viewMode === 'card' ? (
               currentWord && <WordCard item={currentWord} lang={currentSheet?.lang} onNext={() => setState(p => ({ ...p, currentIndex: Math.min(displayWords.length - 1, p.currentIndex + 1) }))} onPrev={() => setState(p => ({ ...p, currentIndex: Math.max(0, p.currentIndex - 1) }))} isFirst={state.currentIndex === 0} isLast={state.currentIndex === displayWords.length - 1} />
