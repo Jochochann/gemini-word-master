@@ -1,8 +1,8 @@
 
-import React from 'https://esm.sh/react@19.2.4';
-import ReactDOM from 'https://esm.sh/react-dom@19.2.4/client';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
-import { QueryClient, QueryClientProvider } from 'https://esm.sh/@tanstack/react-query@5.66.0?external=react,react-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient({
   defaultOptions: {

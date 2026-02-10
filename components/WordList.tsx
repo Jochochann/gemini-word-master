@@ -1,7 +1,7 @@
 
-import React, { useState } from 'https://esm.sh/react@19.2.4';
+import React, { useState } from 'react';
 import { WordItem } from '../types';
-import { Volume2, Search, ArrowRight } from 'https://esm.sh/lucide-react?external=react';
+import { Volume2, Search, ArrowRight } from 'lucide-react';
 
 interface WordListProps {
   words: WordItem[];
@@ -12,7 +12,7 @@ interface WordListProps {
 const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US' }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredWords = words.filter(w =>
+  const filteredWords = words.filter((w: WordItem) =>
     w.word.toLowerCase().includes(searchTerm.toLowerCase()) ||
     w.translation.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -32,19 +32,17 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-800">Library</h2>
           <p className="text-slate-500 text-sm sm:text-base">Browsing {words.length} items ({lang === 'zh-TW' ? '繁體中文' : 'English'})</p>
         </div>
-
         <div className="relative w-full md:w-96">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
           <input
             type="text"
             placeholder="Search words..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
             className="w-full pl-11 pr-5 py-3 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none shadow-sm text-base"
           />
         </div>
       </div>
-
       <div className="flex-1 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
         <div className="overflow-x-auto overflow-y-auto max-h-full custom-scrollbar">
           <table className="w-full text-left border-collapse min-w-[320px]">
@@ -58,39 +56,20 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredWords.map((w, idx) => {
-                const originalIndex = words.findIndex(ow => ow.id === w.id);
+              {filteredWords.map((w: WordItem, idx: number) => {
+                const originalIndex = words.findIndex((ow: WordItem) => ow.id === w.id);
                 return (
                   <tr key={w.id} className="hover:bg-blue-50/40 transition-colors group">
                     <td className="px-5 py-5 text-sm text-slate-400 text-center">{idx + 1}</td>
                     <td className="px-5 py-5">
-                      <button
-                        onClick={() => onSelectWord(originalIndex)}
-                        className="font-bold text-base sm:text-lg text-slate-800 hover:text-blue-600 transition-colors text-left leading-tight"
-                      >
-                        {w.word}
-                      </button>
+                      <button onClick={() => onSelectWord(originalIndex)} className="font-bold text-base sm:text-lg text-slate-800 hover:text-blue-600 transition-colors text-left leading-tight">{w.word}</button>
                     </td>
                     <td className="px-5 py-5 text-sm sm:text-base text-slate-600 font-medium">{w.translation}</td>
-                    <td className="px-5 py-5 text-sm text-slate-500 italic hidden sm:table-cell max-w-[150px] lg:max-w-sm truncate">
-                      {w.example || '-'}
-                    </td>
+                    <td className="px-5 py-5 text-sm text-slate-500 italic hidden sm:table-cell max-w-[150px] lg:max-w-sm truncate">{w.example || '-'}</td>
                     <td className="px-5 py-5 text-center">
                       <div className="flex items-center justify-center space-x-2 sm:space-x-3">
-                        <button
-                          onClick={() => speakWord(w.word)}
-                          className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-slate-100 rounded-xl transition-all active:scale-90"
-                          title="Listen"
-                        >
-                          <Volume2 size={20} />
-                        </button>
-                        <button
-                          onClick={() => onSelectWord(originalIndex)}
-                          className="p-2.5 text-slate-300 group-hover:text-blue-500 transition-all"
-                          title="Open Card"
-                        >
-                          <ArrowRight size={20} />
-                        </button>
+                        <button onClick={() => speakWord(w.word)} className="p-2.5 text-slate-400 hover:text-blue-600 transition-all"><Volume2 size={20} /></button>
+                        <button onClick={() => onSelectWord(originalIndex)} className="p-2.5 text-slate-300 group-hover:text-blue-500 transition-all"><ArrowRight size={20} /></button>
                       </div>
                     </td>
                   </tr>
@@ -99,19 +78,7 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
             </tbody>
           </table>
         </div>
-
-        {filteredWords.length === 0 && (
-          <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
-            <Search size={48} className="text-slate-200 mb-5" />
-            <p className="text-slate-400 text-lg font-medium">No results for "{searchTerm}"</p>
-          </div>
-        )}
       </div>
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-      `}</style>
     </div>
   );
 };
