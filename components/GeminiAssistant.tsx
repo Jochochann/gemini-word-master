@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React from 'https://esm.sh/react@19.2.4';
 import { WordItem } from '../types';
 import {
   Search,
@@ -11,7 +11,7 @@ import {
   Languages,
   BookOpen,
   HelpCircle
-} from 'lucide-react';
+} from 'https://esm.sh/lucide-react?external=react';
 
 interface SearchAssistantProps {
   currentWord: WordItem;

@@ -1,9 +1,10 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'https://esm.sh/react@19.2.4';
 import { AppState, WordItem, ViewMode, SheetConfig } from './types.ts';
 import WordCard from './components/WordCard.tsx';
 import WordList from './components/WordList.tsx';
 import GeminiAssistant from './components/GeminiAssistant.tsx';
+import { useQuery, useQueryClient } from 'https://esm.sh/@tanstack/react-query@5.66.0?external=react,react-dom';
 import {
   Database,
   Settings,
@@ -27,8 +28,9 @@ import {
   Key,
   Home,
   Play,
-  Search
-} from 'lucide-react';
+  Search,
+  RefreshCw
+} from 'https://esm.sh/lucide-react?external=react';
 
 const DEFAULT_SHEET_ID = '1Ul94nfm4HbnoIeUyElhBXC6gPOsbbU-nsDjkzoY_gPU';
 const DEFAULT_SHEETS: SheetConfig[] = [
@@ -37,7 +39,32 @@ const DEFAULT_SHEETS: SheetConfig[] = [
   { name: '台湾旅行', gid: '1574869365', lang: 'zh-TW' }
 ];
 
+const fetchSpreadsheetWords = async (id: string, gid: string): Promise<WordItem[]> => {
+  if (!id) return [];
+  let url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv`;
+  if (gid && gid !== '0') {
+    url += `&gid=${gid}`;
+  }
+
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Failed to fetch sheet`);
+  const csvText = await response.text();
+
+  const lines = csvText.split('\n');
+  return lines.slice(1).map((line, idx) => {
+    const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
+    return {
+      id: (idx + 1).toString(),
+      word: parts[1] || '',
+      translation: parts[2] || '',
+      example: parts[3] || '',
+      notes: parts[4] || ''
+    };
+  }).filter(w => w.word !== '');
+};
+
 const App: React.FC = () => {
+  const queryClient = useQueryClient();
   const [state, setState] = useState<AppState>({
     words: [],
     currentIndex: 0,
@@ -62,6 +89,13 @@ const App: React.FC = () => {
 
   const [jsonInput, setJsonInput] = useState('');
   const [copyFeedback, setCopyFeedback] = useState(false);
+
+  // TanStack Query for data fetching
+  const { data: fetchedWords, isLoading: isQueryLoading, error: queryError } = useQuery({
+    queryKey: ['spreadsheet-words', state.spreadsheetId, state.currentSheetGid],
+    queryFn: () => fetchSpreadsheetWords(state.spreadsheetId, state.currentSheetGid),
+    enabled: !!state.spreadsheetId,
+  });
 
   const currentSheet = useMemo(() => {
     return state.sheets.find(s => s.gid === state.currentSheetGid) || state.sheets[0];
@@ -107,49 +141,10 @@ const App: React.FC = () => {
       ...prev,
       spreadsheetId: targetId,
       sheets: sanitizedSheets,
-      currentSheetGid: initialGid
+      currentSheetGid: initialGid,
+      isLoading: false
     }));
-
-    fetchSheetData(targetId, initialGid);
   }, []);
-
-  const fetchSheetData = async (id: string, gid: string) => {
-    if (!id) return;
-    setState(prev => ({ ...prev, isLoading: true, currentSheetGid: gid }));
-
-    try {
-      let url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv`;
-      if (gid && gid !== '0') {
-        url += `&gid=${gid}`;
-      }
-
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`Failed to fetch sheet`);
-      const csvText = await response.text();
-
-      const lines = csvText.split('\n');
-      const words: WordItem[] = lines.slice(1).map((line, idx) => {
-        const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
-        return {
-          id: (idx + 1).toString(),
-          word: parts[1] || '',
-          translation: parts[2] || '',
-          example: parts[3] || '',
-          notes: parts[4] || ''
-        };
-      }).filter(w => w.word !== '');
-
-      setState(prev => ({
-        ...prev,
-        words,
-        currentIndex: 0,
-        isLoading: false
-      }));
-    } catch (error) {
-      console.error('Failed to fetch data', error);
-      setState(prev => ({ ...prev, isLoading: false }));
-    }
-  };
 
   const handleOpenApiKey = async () => {
     if (window.aistudio?.openSelectKey) {
@@ -168,22 +163,23 @@ const App: React.FC = () => {
       id = inputUrl.trim();
     }
     if (id && tempSheets.length > 0) {
-      updateAllSettings(id, tempSheets);
+      const firstGid = tempSheets[0]?.gid || '0';
+      setState(prev => ({
+        ...prev,
+        spreadsheetId: id,
+        sheets: tempSheets,
+        isSettingsOpen: false,
+        currentSheetGid: firstGid,
+        currentIndex: 0
+      }));
+      localStorage.setItem('gemini_word_master_sheet_id', id);
+      localStorage.setItem('gemini_word_master_sheets', JSON.stringify(tempSheets));
     }
   };
 
-  const updateAllSettings = (id: string, sheets: SheetConfig[]) => {
-    const firstGid = sheets[0]?.gid || '0';
-    setState(prev => ({
-      ...prev,
-      spreadsheetId: id,
-      sheets: sheets,
-      isSettingsOpen: false,
-      currentSheetGid: firstGid
-    }));
-    localStorage.setItem('gemini_word_master_sheet_id', id);
-    localStorage.setItem('gemini_word_master_sheets', JSON.stringify(sheets));
-    fetchSheetData(id, firstGid);
+  const handleClearCache = () => {
+    queryClient.invalidateQueries({ queryKey: ['spreadsheet-words'] });
+    alert('キャッシュをリセットしました。最新のデータを再取得します。');
   };
 
   const addTempSheet = () => {
@@ -209,7 +205,8 @@ const App: React.FC = () => {
     if (window.innerWidth < 1024) setIsSidebarOpen(false);
   };
 
-  const currentWord = state.words[state.currentIndex];
+  const displayWords = fetchedWords || [];
+  const currentWord = displayWords[state.currentIndex];
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden relative font-sans">
@@ -249,21 +246,27 @@ const App: React.FC = () => {
             <div className="h-px bg-slate-100 w-full my-3" />
             <div className="px-2 pb-2 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">単語リスト</div>
 
-            {state.words.map((w, idx) => (
-              <button
-                key={`${w.id}-${idx}`}
-                onClick={() => {
-                  setState(prev => ({ ...prev, currentIndex: idx, viewMode: 'card' }));
-                  if (window.innerWidth < 1024) setIsSidebarOpen(false);
-                }}
-                className={`w-full text-left px-3 py-3.5 rounded-xl transition-all flex items-center justify-between group ${idx === state.currentIndex && state.viewMode === 'card' ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-100' : 'text-slate-600 hover:bg-slate-50'}`}
-              >
-                <div className="truncate pr-2">
-                  <div className="font-bold text-base truncate leading-tight">{w.word}</div>
-                  <div className={`text-sm truncate mt-0.5 ${idx === state.currentIndex && state.viewMode === 'card' ? 'text-blue-500' : 'text-slate-400'}`}>{w.translation}</div>
-                </div>
-              </button>
-            ))}
+            {(isQueryLoading || state.isLoading) ? (
+              <div className="flex items-center justify-center py-10">
+                <Loader2 className="text-slate-300 animate-spin" size={24} />
+              </div>
+            ) : (
+              displayWords.map((w, idx) => (
+                <button
+                  key={`${w.id}-${idx}`}
+                  onClick={() => {
+                    setState(prev => ({ ...prev, currentIndex: idx, viewMode: 'card' }));
+                    if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                  }}
+                  className={`w-full text-left px-3 py-3.5 rounded-xl transition-all flex items-center justify-between group ${idx === state.currentIndex && state.viewMode === 'card' ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-100' : 'text-slate-600 hover:bg-slate-50'}`}
+                >
+                  <div className="truncate pr-2">
+                    <div className="font-bold text-base truncate leading-tight">{w.word}</div>
+                    <div className={`text-sm truncate mt-0.5 ${idx === state.currentIndex && state.viewMode === 'card' ? 'text-blue-500' : 'text-slate-400'}`}>{w.translation}</div>
+                  </div>
+                </button>
+              ))
+            )}
           </div>
         </div>
 
@@ -290,7 +293,7 @@ const App: React.FC = () => {
                   <div className="fixed inset-0 z-20" onClick={() => setIsSheetSelectorOpen(false)} />
                   <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl z-30 overflow-hidden py-1">
                     {state.sheets.map((sheet, sIdx) => (
-                      <button key={sIdx} onClick={() => { setIsSheetSelectorOpen(false); fetchSheetData(state.spreadsheetId, sheet.gid); }} className={`w-full text-left px-4 py-3.5 text-sm transition-colors ${state.currentSheetGid === sheet.gid ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}>
+                      <button key={sIdx} onClick={() => { setIsSheetSelectorOpen(false); setState(prev => ({ ...prev, currentSheetGid: sheet.gid, currentIndex: 0 })); }} className={`w-full text-left px-4 py-3.5 text-sm transition-colors ${state.currentSheetGid === sheet.gid ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:bg-slate-50'}`}>
                         {sheet.name}
                       </button>
                     ))}
@@ -311,19 +314,26 @@ const App: React.FC = () => {
 
         <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative">
           <div className="flex-1 flex flex-col items-center justify-start bg-slate-50/50 overflow-y-auto px-2 sm:px-0 pt-4 pb-32 lg:pb-8">
-            {state.isLoading ? (
+            {(isQueryLoading || state.isLoading) ? (
               <Loader2 className="mx-auto text-blue-500 animate-spin py-20" size={48} />
+            ) : queryError ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <AlertCircle className="text-red-500 mb-4" size={48} />
+                <p className="text-slate-600 font-bold">データの取得に失敗しました</p>
+                <p className="text-slate-400 text-sm mt-2">スプレッドシートが公開されているか確認してください</p>
+                <button onClick={() => queryClient.invalidateQueries({ queryKey: ['spreadsheet-words'] })} className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-xl font-bold">再試行</button>
+              </div>
             ) : state.viewMode === 'card' ? (
               currentWord && <WordCard
                 item={currentWord}
                 lang={currentSheet?.lang}
-                onNext={() => setState(prev => ({ ...prev, currentIndex: Math.min(prev.words.length - 1, prev.currentIndex + 1) }))}
+                onNext={() => setState(prev => ({ ...prev, currentIndex: Math.min(displayWords.length - 1, prev.currentIndex + 1) }))}
                 onPrev={() => setState(prev => ({ ...prev, currentIndex: Math.max(0, prev.currentIndex - 1) }))}
                 isFirst={state.currentIndex === 0}
-                isLast={state.currentIndex === state.words.length - 1}
+                isLast={state.currentIndex === displayWords.length - 1}
               />
             ) : (
-              <WordList words={state.words} lang={currentSheet?.lang} onSelectWord={(idx) => setState(prev => ({ ...prev, currentIndex: idx, viewMode: 'card' }))} />
+              <WordList words={displayWords} lang={currentSheet?.lang} onSelectWord={(idx) => setState(prev => ({ ...prev, currentIndex: idx, viewMode: 'card' }))} />
             )}
           </div>
 
@@ -351,6 +361,26 @@ const App: React.FC = () => {
               <button onClick={() => setState(prev => ({ ...prev, isSettingsOpen: false }))} className="text-slate-400 p-2"><X size={24} /></button>
             </div>
             <div className="flex-1 overflow-y-auto space-y-6 pr-2 custom-scrollbar">
+              <div className="space-y-4">
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between">
+                  <div className="flex items-center space-x-3 text-slate-600">
+                    <RefreshCw size={20} className="text-blue-500" />
+                    <div>
+                      <div className="text-sm font-bold">Data Cache</div>
+                      <div className="text-[10px] text-slate-400">キャッシュ有効期限: 7日間</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleClearCache}
+                    className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-all shadow-sm active:scale-95"
+                  >
+                    Reset Cache
+                  </button>
+                </div>
+              </div>
+
+              <div className="h-px bg-slate-100 w-full" />
+
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Spreadsheet URL</label>
                 <input type="text" value={inputUrl} onChange={(e) => setInputUrl(e.target.value)} className="w-full px-4 py-3 bg-slate-100 rounded-2xl outline-none" placeholder="Spreadsheet link..." />

@@ -1,7 +1,7 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect } from 'https://esm.sh/react@19.2.4';
 import { WordItem } from '../types';
-import { Volume2, Lightbulb, ChevronRight, ChevronLeft, Quote } from 'lucide-react';
+import { Volume2, Lightbulb, ChevronRight, ChevronLeft, Quote } from 'https://esm.sh/lucide-react?external=react';
 
 interface WordCardProps {
   item: WordItem;

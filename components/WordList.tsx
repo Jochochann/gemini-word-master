@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState } from 'https://esm.sh/react@19.2.4';
 import { WordItem } from '../types';
-import { Volume2, Search, ArrowRight } from 'lucide-react';
+import { Volume2, Search, ArrowRight } from 'https://esm.sh/lucide-react?external=react';
 
 interface WordListProps {
   words: WordItem[];
