@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { WordItem } from '../types';
 import { Volume2, Search, ArrowRight, Hash } from 'lucide-react';
+import { useSpeech } from '../hooks/useSpeech';
 
 interface WordListProps {
   words: WordItem[];
@@ -11,18 +12,15 @@ interface WordListProps {
 
 const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US' }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { speak } = useSpeech();
 
-  const filteredWords = words.filter((w: WordItem) => 
+  const filteredWords = words.filter((w: WordItem) =>
     w.word.toLowerCase().includes(searchTerm.toLowerCase()) ||
     w.translation.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const speakWord = (word: string) => {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(word);
-    utterance.lang = lang;
-    utterance.rate = 0.9;
-    window.speechSynthesis.speak(utterance);
+    speak(word, lang, 0.9);
   };
 
   return (
@@ -39,7 +37,7 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
         </div>
         <div className="relative w-full md:w-[400px]">
           <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
-          <input 
+          <input
             type="text"
             placeholder="Search words or meanings..."
             value={searchTerm}
@@ -70,8 +68,8 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
                       {String(idx + 1).padStart(2, '0')}
                     </td>
                     <td className="px-6 py-6">
-                      <button 
-                        onClick={() => onSelectWord(originalIndex)} 
+                      <button
+                        onClick={() => onSelectWord(originalIndex)}
                         className="font-bold text-lg text-slate-200 group-hover/row:text-indigo-400 transition-colors text-left leading-tight"
                       >
                         {w.word}
@@ -87,14 +85,14 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
                     </td>
                     <td className="px-6 py-6 text-center">
                       <div className="flex items-center justify-center space-x-2">
-                        <button 
-                          onClick={() => speakWord(w.word)} 
+                        <button
+                          onClick={() => speakWord(w.word)}
                           className="p-2.5 text-slate-600 hover:text-indigo-400 hover:bg-indigo-400/10 rounded-xl transition-all"
                         >
                           <Volume2 size={20} />
                         </button>
-                        <button 
-                          onClick={() => onSelectWord(originalIndex)} 
+                        <button
+                          onClick={() => onSelectWord(originalIndex)}
                           className="p-2.5 text-slate-700 group-hover/row:text-indigo-500 group-hover/row:translate-x-1 transition-all"
                         >
                           <ArrowRight size={20} />

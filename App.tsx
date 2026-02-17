@@ -5,6 +5,8 @@ import WordCard from './components/WordCard.tsx';
 import WordList from './components/WordList.tsx';
 import GeminiAssistant from './components/GeminiAssistant.tsx';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetchSpreadsheetWords, extractId, DEFAULT_SHEETS, DEFAULT_SHEET_ID } from './services/spreadsheet';
+import LanguageSelector from './components/LanguageSelector';
 import {
   Settings,
   Loader2,
@@ -25,43 +27,12 @@ import {
   Type
 } from 'lucide-react';
 
-const DEFAULT_SHEET_ID = '1Ul94nfm4HbnoIeUyElhBXC6gPOsbbU-nsDjkzoY_gPU';
-const DEFAULT_SHEETS: SheetConfig[] = [
-  { name: 'GoFluent', gid: '0', lang: 'en-US' },
-  { name: 'Atsueigo', gid: '420352437', lang: 'en-US' },
-  { name: 'Atsu構文', gid: '1185143192', lang: 'en-US' },
-  { name: 'Grammer', gid: '14369093', lang: 'en-US' },
-  { name: '台湾旅行', gid: '1574869365', lang: 'zh-TW' }
-];
 
-const extractId = (url: string) => {
-  if (url.includes('docs.google.com/spreadsheets')) {
-    const idMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
-    return idMatch ? idMatch[1] : url.trim();
-  }
-  return url.trim();
-};
 
-const fetchSpreadsheetWords = async (id: string, gid: string): Promise<WordItem[]> => {
-  if (!id) return [];
-  const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&gid=${gid || '0'}`;
 
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('FETCH_FAILED');
-  const csvText = await response.text();
 
-  const lines = csvText.split('\n');
-  return lines.slice(1).map((line, idx) => {
-    const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
-    return {
-      id: (idx + 1).toString(),
-      word: parts[1] || '',
-      translation: parts[2] || '',
-      example: parts[3] || '',
-      notes: parts[4] || ''
-    };
-  }).filter(w => w.word !== '');
-};
+
+
 
 const App: React.FC = () => {
   const queryClient = useQueryClient();
@@ -165,40 +136,7 @@ const App: React.FC = () => {
   const displayWords = fetchedWords || [];
   const currentWord = displayWords[state.currentIndex];
 
-  const LanguageSelector = ({ label, sheets, type, active }: { label: string, sheets: SheetConfig[], type: 'en' | 'tw', active: boolean }) => (
-    <div className="relative flex-shrink-0">
-      <button
-        onClick={() => setOpenDropdown(openDropdown === type ? null : type)}
-        className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border transition-all text-xs font-bold whitespace-nowrap ${active
-            ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20'
-            : 'bg-slate-900 border-slate-800 text-slate-500 hover:bg-slate-800 hover:text-slate-300'
-          }`}
-      >
-        <span className="tracking-widest uppercase">{label}</span>
-        {active && <span className="opacity-80 font-medium truncate max-w-[60px] sm:max-w-[100px]">| {currentSheet?.name}</span>}
-        <ChevronDown size={14} className={`transition-transform flex-shrink-0 ${openDropdown === type ? 'rotate-180' : ''}`} />
-      </button>
 
-      {openDropdown === type && (
-        <>
-          <div className="fixed inset-0 z-20" onClick={() => setOpenDropdown(null)} />
-          <div className="absolute top-full left-0 mt-2 w-48 sm:w-56 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-30 py-1.5 overflow-hidden animate-in fade-in zoom-in duration-150">
-            {sheets.length > 0 ? sheets.map((sheet) => (
-              <button
-                key={sheet.gid}
-                onClick={() => { setOpenDropdown(null); setState(p => ({ ...p, currentSheetGid: sheet.gid, currentIndex: 0 })); }}
-                className={`w-full text-left px-4 py-3 text-xs font-bold transition-all ${state.currentSheetGid === sheet.gid ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
-              >
-                {sheet.name}
-              </button>
-            )) : (
-              <div className="px-4 py-3 text-[10px] text-slate-600 italic">No sheets configured</div>
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  );
 
   return (
     <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden relative font-sans">
@@ -239,8 +177,28 @@ const App: React.FC = () => {
         <header className="h-20 flex items-center justify-between px-4 sm:px-6 border-b border-slate-800 bg-slate-950/50 backdrop-blur-md sticky top-0 z-30">
           <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-slate-400 lg:hidden flex-shrink-0 hover:bg-slate-800 rounded-lg"><Menu size={20} /></button>
-            <LanguageSelector label="EN" sheets={englishSheets} type="en" active={currentSheet?.lang === 'en-US'} />
-            <LanguageSelector label="TW" sheets={taiwaneseSheets} type="tw" active={currentSheet?.lang === 'zh-TW'} />
+            <LanguageSelector
+              label="EN"
+              sheets={englishSheets}
+              type="en"
+              active={currentSheet?.lang === 'en-US'}
+              currentSheetName={currentSheet?.name}
+              onSelectSheet={(gid) => setState(p => ({ ...p, currentSheetGid: gid, currentIndex: 0 }))}
+              openDropdown={openDropdown}
+              setOpenDropdown={setOpenDropdown}
+              currentSheetGid={state.currentSheetGid}
+            />
+            <LanguageSelector
+              label="TW"
+              sheets={taiwaneseSheets}
+              type="tw"
+              active={currentSheet?.lang === 'zh-TW'}
+              currentSheetName={currentSheet?.name}
+              onSelectSheet={(gid) => setState(p => ({ ...p, currentSheetGid: gid, currentIndex: 0 }))}
+              openDropdown={openDropdown}
+              setOpenDropdown={setOpenDropdown}
+              currentSheetGid={state.currentSheetGid}
+            />
           </div>
 
           <div className="flex items-center space-x-3 flex-shrink-0">

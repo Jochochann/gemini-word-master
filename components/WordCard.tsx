@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { WordItem } from '../types';
 import { Volume2, Lightbulb, ChevronRight, ChevronLeft, Quote } from 'lucide-react';
+import { useSpeech } from '../hooks/useSpeech';
 
 interface WordCardProps {
   item: WordItem;
@@ -13,40 +14,27 @@ interface WordCardProps {
 }
 
 const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex, totalCount, lang = 'en-US' }) => {
+  const { speak, cancel } = useSpeech();
+
   const speakText = (text: string) => {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-    utterance.rate = 0.85;
-    window.speechSynthesis.speak(utterance);
+    speak(text, lang, 0.85);
   };
 
   useEffect(() => {
     let timeoutId: number | undefined;
 
     if (item.word) {
-      window.speechSynthesis.cancel();
-      const wordUtterance = new SpeechSynthesisUtterance(item.word);
-      wordUtterance.lang = lang;
-      wordUtterance.rate = 0.85;
-
-      wordUtterance.onend = () => {
+      speak(item.word, lang, 0.85, () => {
         if (item.example && lang !== 'zh-TW') {
-          timeoutId = window.setTimeout(() => {
-            const exampleUtterance = new SpeechSynthesisUtterance(item.example!);
-            exampleUtterance.lang = lang;
-            exampleUtterance.rate = 0.85;
-            window.speechSynthesis.speak(exampleUtterance);
+          setTimeout(() => {
+            speak(item.example!, lang, 0.85);
           }, 500);
         }
-      };
-
-      window.speechSynthesis.speak(wordUtterance);
+      });
     }
 
     return () => {
-      if (timeoutId) window.clearTimeout(timeoutId);
-      window.speechSynthesis.cancel();
+      cancel();
     };
   }, [item.word, lang]);
 
