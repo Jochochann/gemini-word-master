@@ -18,7 +18,7 @@ interface SearchAssistantProps {
   lang?: string;
 }
 
-const GeminiAssistant: React.FC<SearchAssistantProps> = ({ currentWord, lang = 'en-US' }) => {
+const WordAssistant: React.FC<SearchAssistantProps> = ({ currentWord, lang = 'en-US' }) => {
   if (!currentWord) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-10 text-slate-700 bg-slate-900">
@@ -95,4 +95,4 @@ const GeminiAssistant: React.FC<SearchAssistantProps> = ({ currentWord, lang = '
   );
 };
 
-export default GeminiAssistant;
+export default WordAssistant;

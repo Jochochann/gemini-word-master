@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { AppState, WordItem, ViewMode, SheetConfig } from './types.ts';
 import WordCard from './components/WordCard.tsx';
 import WordList from './components/WordList.tsx';
-import GeminiAssistant from './components/GeminiAssistant.tsx';
+import WordAssistant from './components/WordAssistant.tsx';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchSpreadsheetWords, extractId, DEFAULT_SHEETS, DEFAULT_SHEET_ID } from './services/spreadsheet';
 import LanguageSelector from './components/LanguageSelector';
@@ -362,7 +362,7 @@ const App: React.FC = () => {
                 <X size={20} />
               </button>
             )}
-            {currentWord && <GeminiAssistant key={currentWord.id + currentWord.word} currentWord={currentWord} lang={currentSheet?.lang} />}
+            {currentWord && <WordAssistant key={currentWord.id + currentWord.word} currentWord={currentWord} lang={currentSheet?.lang} />}
           </div>
         </div>
 
