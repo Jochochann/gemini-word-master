@@ -78,7 +78,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
                   </span>
                 )}
                 {item.pronunciation && (
-                  <span className="text-slate-400 text-xs font-mono tracking-tight opacity-80">/{item.pronunciation}/</span>
+                  <span className="text-slate-300 text-xs font-mono tracking-tight opacity-80">/{item.pronunciation}/</span>
                 )}
               </div>
               <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-sm">
@@ -89,7 +89,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
               {onToggleBookmark && (
                 <button
                   onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }}
-                  className={`p-3 rounded-xl shadow-xl transition-all active:scale-95 flex-shrink-0 mt-1 ${isBookmarked ? 'bg-amber-500 text-white shadow-amber-500/20' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+                  className={`p-3 rounded-xl shadow-xl transition-all active:scale-95 flex-shrink-0 mt-1 ${isBookmarked ? 'bg-amber-500 text-white shadow-amber-500/20' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`}
                 >
                   <Star size={20} strokeWidth={isBookmarked ? 2.5 : 2} fill={isBookmarked ? "currentColor" : "none"} />
                 </button>
@@ -150,13 +150,13 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
         {/* Desktop Navigation */}
         <button
           onClick={(e) => { e.stopPropagation(); onPrev(); }}
-          className="hidden sm:flex absolute -left-12 lg:-left-20 top-1/2 -translate-y-1/2 p-4 rounded-full transition-all bg-slate-900 border border-slate-800 shadow-2xl text-slate-400 hover:text-indigo-400 hover:scale-110 active:scale-95"
+          className="hidden sm:flex absolute -left-12 lg:-left-20 top-1/2 -translate-y-1/2 p-4 rounded-full transition-all bg-slate-900 border border-slate-800 shadow-2xl text-slate-300 hover:text-indigo-400 hover:scale-110 active:scale-95"
         >
           <ChevronLeft size={36} />
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); onNext(); }}
-          className="hidden sm:flex absolute -right-12 lg:-right-20 top-1/2 -translate-y-1/2 p-4 rounded-full transition-all bg-slate-900 border border-slate-800 shadow-2xl text-slate-400 hover:text-indigo-400 hover:scale-110 active:scale-95"
+          className="hidden sm:flex absolute -right-12 lg:-right-20 top-1/2 -translate-y-1/2 p-4 rounded-full transition-all bg-slate-900 border border-slate-800 shadow-2xl text-slate-300 hover:text-indigo-400 hover:scale-110 active:scale-95"
         >
           <ChevronRight size={36} />
         </button>

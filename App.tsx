@@ -219,7 +219,7 @@ const App: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => sidebarContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className="p-1.5 text-slate-400 hover:text-white hover:bg-indigo-600 rounded-lg transition-all"
+                  className="p-1.5 text-slate-300 hover:text-white hover:bg-indigo-600 rounded-lg transition-all"
                   title="Scroll to Top"
                 >
                   <ArrowUpToLine size={14} />
@@ -251,7 +251,7 @@ const App: React.FC = () => {
       <main className="flex-1 flex flex-col relative h-full overflow-hidden">
         <header className="h-20 flex items-center justify-between px-4 sm:px-6 border-b border-slate-800 bg-slate-950/50 backdrop-blur-md sticky top-0 z-30">
           <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
-            <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-slate-400 lg:hidden flex-shrink-0 hover:bg-slate-800 rounded-lg"><Menu size={20} /></button>
+            <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-slate-300 lg:hidden flex-shrink-0 hover:bg-slate-800 rounded-lg"><Menu size={20} /></button>
             <LanguageSelector
               label="EN"
               sheets={englishSheets}

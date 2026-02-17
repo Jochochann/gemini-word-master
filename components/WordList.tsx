@@ -64,7 +64,7 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
                 const originalIndex = words.findIndex((ow: WordItem) => ow.id === w.id);
                 return (
                   <tr key={w.id} className="hover:bg-indigo-500/5 transition-all group/row">
-                    <td className="px-6 py-6 text-xs font-mono text-slate-600 text-center">
+                    <td className="px-6 py-6 text-xs font-mono text-slate-400 text-center font-bold opacity-60">
                       {String(idx + 1).padStart(2, '0')}
                     </td>
                     <td className="px-6 py-6">
@@ -87,13 +87,13 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
                       <div className="flex items-center justify-center space-x-2">
                         <button
                           onClick={() => speakWord(w.word)}
-                          className="p-2.5 text-slate-600 hover:text-indigo-400 hover:bg-indigo-400/10 rounded-xl transition-all"
+                          className="p-2.5 text-slate-400 hover:text-indigo-400 hover:bg-indigo-400/10 rounded-xl transition-all"
                         >
                           <Volume2 size={20} />
                         </button>
                         <button
                           onClick={() => onSelectWord(originalIndex)}
-                          className="p-2.5 text-slate-700 group-hover/row:text-indigo-500 group-hover/row:translate-x-1 transition-all"
+                          className="p-2.5 text-slate-400 group-hover/row:text-indigo-500 group-hover/row:translate-x-1 transition-all"
                         >
                           <ArrowRight size={20} />
                         </button>
