@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { AppState, WordItem, ViewMode, SheetConfig } from './types.ts';
 import WordCard from './components/WordCard.tsx';
 import WordList from './components/WordList.tsx';
@@ -53,6 +53,8 @@ const App: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAssistantOpenMobile, setIsAssistantOpenMobile] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<'en' | 'tw' | null>(null);
+
+  const sidebarRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const { data: fetchedWords, isLoading: isQueryLoading, error: queryError, refetch, isRefetching } = useQuery<WordItem[]>({
     queryKey: ['spreadsheet-words', state.spreadsheetId, state.currentSheetGid],
@@ -110,6 +112,15 @@ const App: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (state.viewMode === 'card' && sidebarRefs.current[state.currentIndex]) {
+      sidebarRefs.current[state.currentIndex]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+  }, [state.currentIndex, state.viewMode]);
+
   const handleClearCache = async () => {
     setIsRefreshing(true);
     queryClient.removeQueries({ queryKey: ['spreadsheet-words'] });
@@ -161,7 +172,12 @@ const App: React.FC = () => {
               {(isRefetching || isQueryLoading) && <Loader2 size={12} className="animate-spin text-indigo-500" />}
             </div>
             {displayWords.map((w, idx) => (
-              <button key={w.id} onClick={() => setState(p => ({ ...p, currentIndex: idx, viewMode: 'card' }))} className={`w-full text-left px-3.5 py-3 rounded-xl transition-all mb-1 group ${idx === state.currentIndex && state.viewMode === 'card' ? 'bg-indigo-500/10 text-indigo-400' : 'text-slate-500 hover:bg-slate-800'}`}>
+              <button
+                key={w.id}
+                ref={(el) => { sidebarRefs.current[idx] = el; }}
+                onClick={() => setState(p => ({ ...p, currentIndex: idx, viewMode: 'card' }))}
+                className={`w-full text-left px-3.5 py-3 rounded-xl transition-all mb-1 group ${idx === state.currentIndex && state.viewMode === 'card' ? 'bg-indigo-500/10 text-indigo-400' : 'text-slate-500 hover:bg-slate-800'}`}
+              >
                 <div className="truncate text-xs font-medium">{w.word}</div>
               </button>
             ))}
