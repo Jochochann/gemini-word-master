@@ -24,7 +24,9 @@ import {
   Link2,
   Plus,
   Trash2,
-  Type
+  Type,
+  Shuffle,
+  MonitorPlay
 } from 'lucide-react';
 
 
@@ -44,7 +46,9 @@ const App: React.FC = () => {
     sheets: [],
     currentSheetGid: '',
     isSettingsOpen: false,
-    viewMode: 'list'
+    viewMode: 'list',
+    isAutoPlay: false,
+    isShuffle: false
   });
 
   const [inputUrl, setInputUrl] = useState('');
@@ -144,8 +148,23 @@ const App: React.FC = () => {
     setState(p => ({ ...p, sheets: newSheets }));
   };
 
-  const displayWords = fetchedWords || [];
+  const displayWords = useMemo(() => {
+    if (!fetchedWords) return [];
+    if (!state.isShuffle) return fetchedWords;
+    // Shuffle logic: consistent shuffle based on seed or just memoized until shuffle toggled off/on or data changes
+    // Simple approach: shuffle once when isShuffle becomes true or data changes
+    return [...fetchedWords].sort(() => Math.random() - 0.5);
+  }, [fetchedWords, state.isShuffle]);
+
   const currentWord = displayWords[state.currentIndex];
+
+  const handleSpeechComplete = () => {
+    if (state.isAutoPlay) {
+      setTimeout(() => {
+        setState(p => ({ ...p, currentIndex: (p.currentIndex + 1) % displayWords.length }));
+      }, 2000); // Wait 2 seconds before next word
+    }
+  };
 
 
 
@@ -219,12 +238,28 @@ const App: React.FC = () => {
 
           <div className="flex items-center space-x-3 flex-shrink-0">
             {state.viewMode === 'card' && (
-              <button
-                onClick={() => setIsAssistantOpenMobile(!isAssistantOpenMobile)}
-                className={`p-2.5 rounded-xl border transition-all ${isAssistantOpenMobile ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-800 text-indigo-400 shadow-lg shadow-indigo-600/10 hover:bg-slate-800'} ${isAssistantOpenMobile ? '' : 'lg:hidden'}`}
-              >
-                <Sparkles size={20} />
-              </button>
+              <>
+                <button
+                  onClick={() => setState(p => ({ ...p, isShuffle: !p.isShuffle, currentIndex: 0 }))}
+                  className={`p-2.5 rounded-xl border transition-all ${state.isShuffle ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-800 text-indigo-400 shadow-lg shadow-indigo-600/10 hover:bg-slate-800'}`}
+                  title="Shuffle Mode"
+                >
+                  <Shuffle size={20} />
+                </button>
+                <button
+                  onClick={() => setState(p => ({ ...p, isAutoPlay: !p.isAutoPlay }))}
+                  className={`p-2.5 rounded-xl border transition-all ${state.isAutoPlay ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-800 text-indigo-400 shadow-lg shadow-indigo-600/10 hover:bg-slate-800'}`}
+                  title="Auto-Play Mode"
+                >
+                  <MonitorPlay size={20} />
+                </button>
+                <button
+                  onClick={() => setIsAssistantOpenMobile(!isAssistantOpenMobile)}
+                  className={`p-2.5 rounded-xl border transition-all ${isAssistantOpenMobile ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-800 text-indigo-400 shadow-lg shadow-indigo-600/10 hover:bg-slate-800'} ${isAssistantOpenMobile ? '' : 'lg:hidden'}`}
+                >
+                  <Sparkles size={20} />
+                </button>
+              </>
             )}
 
             <div className="hidden sm:flex bg-slate-900 p-1 rounded-xl border border-slate-800">
@@ -256,6 +291,7 @@ const App: React.FC = () => {
                 totalCount={displayWords.length}
                 onNext={() => setState(p => ({ ...p, currentIndex: (p.currentIndex + 1) % displayWords.length }))}
                 onPrev={() => setState(p => ({ ...p, currentIndex: (p.currentIndex - 1 + displayWords.length) % displayWords.length }))}
+                onSpeechComplete={handleSpeechComplete}
               />
             ) : (
               <WordList words={displayWords} lang={currentSheet?.lang} onSelectWord={(idx) => setState(p => ({ ...p, currentIndex: idx, viewMode: 'card' }))} />

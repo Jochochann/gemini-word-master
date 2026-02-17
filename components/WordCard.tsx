@@ -11,9 +11,10 @@ interface WordCardProps {
   currentIndex: number;
   totalCount: number;
   lang?: string;
+  onSpeechComplete?: () => void;
 }
 
-const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex, totalCount, lang = 'en-US' }) => {
+const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex, totalCount, lang = 'en-US', onSpeechComplete }) => {
   const { speak, cancel } = useSpeech();
 
   const speakText = (text: string) => {
@@ -26,14 +27,19 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
     if (item.word) {
       speak(item.word, lang, 0.85, () => {
         if (item.example && lang !== 'zh-TW') {
-          setTimeout(() => {
-            speak(item.example!, lang, 0.85);
+          timeoutId = window.setTimeout(() => {
+            speak(item.example!, lang, 0.85, () => {
+              if (onSpeechComplete) onSpeechComplete();
+            });
           }, 500);
+        } else {
+          if (onSpeechComplete) onSpeechComplete();
         }
       });
     }
 
     return () => {
+      if (timeoutId) clearTimeout(timeoutId);
       cancel();
     };
   }, [item.word, lang]);

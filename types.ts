@@ -29,6 +29,8 @@ export interface AppState {
   currentSheetGid: string;
   isSettingsOpen: boolean;
   viewMode: ViewMode;
+  isAutoPlay?: boolean;
+  isShuffle?: boolean;
 }
 
 // AI Studioのグローバルプロパティを型定義
