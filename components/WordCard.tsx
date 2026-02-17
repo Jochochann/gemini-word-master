@@ -7,12 +7,12 @@ interface WordCardProps {
   item: WordItem;
   onNext: () => void;
   onPrev: () => void;
-  isFirst: boolean;
-  isLast: boolean;
+  currentIndex: number;
+  totalCount: number;
   lang?: string;
 }
 
-const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLast, lang = 'en-US' }) => {
+const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex, totalCount, lang = 'en-US' }) => {
   const speakText = (text: string) => {
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
@@ -81,8 +81,8 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
                 {item.word}
               </h2>
             </div>
-            <button 
-              onClick={handleManualSpeak} 
+            <button
+              onClick={handleManualSpeak}
               className="p-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-xl shadow-indigo-600/20 transition-all active:scale-95 flex-shrink-0 mt-1"
             >
               <Volume2 size={20} strokeWidth={2.5} />
@@ -107,8 +107,8 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
                     <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Example</span>
                   </div>
                   {lang !== 'zh-TW' && (
-                    <button 
-                      onClick={handleSpeakExample} 
+                    <button
+                      onClick={handleSpeakExample}
                       className="p-1 text-slate-500 hover:text-indigo-400 transition-all"
                     >
                       <Volume2 size={16} />
@@ -134,17 +134,15 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
         </div>
 
         {/* Desktop Navigation */}
-        <button 
-          disabled={isFirst} 
-          onClick={(e) => { e.stopPropagation(); onPrev(); }} 
-          className={`hidden sm:flex absolute -left-12 lg:-left-20 top-1/2 -translate-y-1/2 p-4 rounded-full transition-all ${isFirst ? 'text-slate-800' : 'bg-slate-900 border border-slate-800 shadow-2xl text-slate-400 hover:text-indigo-400 hover:scale-110 active:scale-95'}`}
+        <button
+          onClick={(e) => { e.stopPropagation(); onPrev(); }}
+          className="hidden sm:flex absolute -left-12 lg:-left-20 top-1/2 -translate-y-1/2 p-4 rounded-full transition-all bg-slate-900 border border-slate-800 shadow-2xl text-slate-400 hover:text-indigo-400 hover:scale-110 active:scale-95"
         >
           <ChevronLeft size={36} />
         </button>
-        <button 
-          disabled={isLast} 
-          onClick={(e) => { e.stopPropagation(); onNext(); }} 
-          className={`hidden sm:flex absolute -right-12 lg:-right-20 top-1/2 -translate-y-1/2 p-4 rounded-full transition-all ${isLast ? 'text-slate-800' : 'bg-slate-900 border border-slate-800 shadow-2xl text-slate-400 hover:text-indigo-400 hover:scale-110 active:scale-95'}`}
+        <button
+          onClick={(e) => { e.stopPropagation(); onNext(); }}
+          className="hidden sm:flex absolute -right-12 lg:-right-20 top-1/2 -translate-y-1/2 p-4 rounded-full transition-all bg-slate-900 border border-slate-800 shadow-2xl text-slate-400 hover:text-indigo-400 hover:scale-110 active:scale-95"
         >
           <ChevronRight size={36} />
         </button>
@@ -152,20 +150,18 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, isFirst, isLa
 
       {/* Mobile Navigation */}
       <div className="mt-6 flex sm:hidden justify-center items-center space-x-8">
-        <button 
-          disabled={isFirst} 
-          onClick={onPrev} 
-          className={`p-3.5 rounded-full border transition-all ${isFirst ? 'bg-slate-900/50 border-slate-800 text-slate-800' : 'bg-slate-900 border-slate-700 text-slate-300 shadow-xl active:scale-90'}`}
+        <button
+          onClick={onPrev}
+          className="p-3.5 rounded-full border transition-all bg-slate-900 border-slate-700 text-slate-300 shadow-xl active:scale-90"
         >
           <ChevronLeft size={24} />
         </button>
         <div className="px-5 py-2 bg-slate-900 border border-slate-800 text-slate-400 rounded-full font-black text-[10px] tracking-widest shadow-inner">
-          {item.id.padStart(2, '0')}
+          {currentIndex + 1} / {totalCount}
         </div>
-        <button 
-          disabled={isLast} 
-          onClick={onNext} 
-          className={`p-3.5 rounded-full border transition-all ${isLast ? 'bg-slate-900/50 border-slate-800 text-slate-800' : 'bg-indigo-600 border-indigo-500 text-white shadow-xl shadow-indigo-600/20 active:scale-90'}`}
+        <button
+          onClick={onNext}
+          className="p-3.5 rounded-full border transition-all bg-indigo-600 border-indigo-500 text-white shadow-xl shadow-indigo-600/20 active:scale-90"
         >
           <ChevronRight size={24} />
         </button>

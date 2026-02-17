@@ -5,11 +5,11 @@ import WordCard from './components/WordCard.tsx';
 import WordList from './components/WordList.tsx';
 import GeminiAssistant from './components/GeminiAssistant.tsx';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { 
-  Settings, 
-  Loader2, 
-  BookOpen, 
-  Menu, 
+import {
+  Settings,
+  Loader2,
+  BookOpen,
+  Menu,
   X,
   LayoutGrid,
   ChevronDown,
@@ -49,7 +49,7 @@ const fetchSpreadsheetWords = async (id: string, gid: string): Promise<WordItem[
   const response = await fetch(url);
   if (!response.ok) throw new Error('FETCH_FAILED');
   const csvText = await response.text();
-  
+
   const lines = csvText.split('\n');
   return lines.slice(1).map((line, idx) => {
     const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
@@ -78,11 +78,11 @@ const App: React.FC = () => {
 
   const [inputUrl, setInputUrl] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isAssistantOpenMobile, setIsAssistantOpenMobile] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<'en' | 'tw' | null>(null);
-  
+
   const { data: fetchedWords, isLoading: isQueryLoading, error: queryError, refetch, isRefetching } = useQuery<WordItem[]>({
     queryKey: ['spreadsheet-words', state.spreadsheetId, state.currentSheetGid],
     queryFn: () => fetchSpreadsheetWords(state.spreadsheetId, state.currentSheetGid),
@@ -100,7 +100,7 @@ const App: React.FC = () => {
     if (window.innerWidth >= 1024) setIsSidebarOpen(true);
     const savedId = localStorage.getItem('gemini_word_master_sheet_id') || DEFAULT_SHEET_ID;
     const savedSheetsStr = localStorage.getItem('gemini_word_master_sheets');
-    
+
     let targetSheets = [...DEFAULT_SHEETS];
     if (savedSheetsStr) {
       try {
@@ -113,12 +113,12 @@ const App: React.FC = () => {
         console.error("Failed to parse saved sheets", e);
       }
     }
-    
+
     setInputUrl(`https://docs.google.com/spreadsheets/d/${savedId}/edit`);
-    
-    setState(prev => ({ 
-      ...prev, 
-      spreadsheetId: savedId, 
+
+    setState(prev => ({
+      ...prev,
+      spreadsheetId: savedId,
       sheets: targetSheets,
       currentSheetGid: targetSheets[0]?.gid || '0',
       isLoading: false
@@ -128,9 +128,9 @@ const App: React.FC = () => {
   const handleApplySettings = () => {
     const id = extractId(inputUrl);
     if (id) {
-      setState(prev => ({ 
-        ...prev, 
-        spreadsheetId: id, 
+      setState(prev => ({
+        ...prev,
+        spreadsheetId: id,
         isSettingsOpen: false,
         currentIndex: 0
       }));
@@ -167,27 +167,26 @@ const App: React.FC = () => {
 
   const LanguageSelector = ({ label, sheets, type, active }: { label: string, sheets: SheetConfig[], type: 'en' | 'tw', active: boolean }) => (
     <div className="relative flex-shrink-0">
-      <button 
-        onClick={() => setOpenDropdown(openDropdown === type ? null : type)} 
-        className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border transition-all text-xs font-bold whitespace-nowrap ${
-          active 
-            ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20' 
+      <button
+        onClick={() => setOpenDropdown(openDropdown === type ? null : type)}
+        className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border transition-all text-xs font-bold whitespace-nowrap ${active
+            ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20'
             : 'bg-slate-900 border-slate-800 text-slate-500 hover:bg-slate-800 hover:text-slate-300'
-        }`}
+          }`}
       >
         <span className="tracking-widest uppercase">{label}</span>
         {active && <span className="opacity-80 font-medium truncate max-w-[60px] sm:max-w-[100px]">| {currentSheet?.name}</span>}
         <ChevronDown size={14} className={`transition-transform flex-shrink-0 ${openDropdown === type ? 'rotate-180' : ''}`} />
       </button>
-      
+
       {openDropdown === type && (
         <>
           <div className="fixed inset-0 z-20" onClick={() => setOpenDropdown(null)} />
           <div className="absolute top-full left-0 mt-2 w-48 sm:w-56 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl z-30 py-1.5 overflow-hidden animate-in fade-in zoom-in duration-150">
             {sheets.length > 0 ? sheets.map((sheet) => (
-              <button 
-                key={sheet.gid} 
-                onClick={() => { setOpenDropdown(null); setState(p => ({...p, currentSheetGid: sheet.gid, currentIndex: 0})); }} 
+              <button
+                key={sheet.gid}
+                onClick={() => { setOpenDropdown(null); setState(p => ({ ...p, currentSheetGid: sheet.gid, currentIndex: 0 })); }}
                 className={`w-full text-left px-4 py-3 text-xs font-bold transition-all ${state.currentSheetGid === sheet.gid ? 'bg-indigo-500 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}
               >
                 {sheet.name}
@@ -216,15 +215,15 @@ const App: React.FC = () => {
 
         <div className="p-4 overflow-y-auto flex-1 custom-scrollbar">
           <nav className="space-y-1.5">
-            <button onClick={() => setState(p => ({...p, viewMode: 'card'}))} className={`w-full text-left px-4 py-3.5 rounded-xl transition-all flex items-center space-x-3 mb-2 ${state.viewMode === 'card' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}><Play size={18} /><span className="font-bold text-sm">カード学習</span></button>
-            <button onClick={() => setState(p => ({...p, viewMode: 'list'}))} className={`w-full text-left px-4 py-3.5 rounded-xl transition-all flex items-center space-x-3 mb-2 ${state.viewMode === 'list' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:bg-slate-800'}`}><LayoutGrid size={18} /><span className="font-bold text-sm">単語一覧</span></button>
+            <button onClick={() => setState(p => ({ ...p, viewMode: 'card' }))} className={`w-full text-left px-4 py-3.5 rounded-xl transition-all flex items-center space-x-3 mb-2 ${state.viewMode === 'card' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}><Play size={18} /><span className="font-bold text-sm">カード学習</span></button>
+            <button onClick={() => setState(p => ({ ...p, viewMode: 'list' }))} className={`w-full text-left px-4 py-3.5 rounded-xl transition-all flex items-center space-x-3 mb-2 ${state.viewMode === 'list' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:bg-slate-800'}`}><LayoutGrid size={18} /><span className="font-bold text-sm">単語一覧</span></button>
             <div className="h-px bg-slate-800 w-full my-4" />
             <div className="px-3 mb-4 flex items-center justify-between">
               <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Vocabulary List</span>
               {(isRefetching || isQueryLoading) && <Loader2 size={12} className="animate-spin text-indigo-500" />}
             </div>
             {displayWords.map((w, idx) => (
-              <button key={w.id} onClick={() => setState(p => ({...p, currentIndex: idx, viewMode: 'card'}))} className={`w-full text-left px-3.5 py-3 rounded-xl transition-all mb-1 group ${idx === state.currentIndex && state.viewMode === 'card' ? 'bg-indigo-500/10 text-indigo-400' : 'text-slate-500 hover:bg-slate-800'}`}>
+              <button key={w.id} onClick={() => setState(p => ({ ...p, currentIndex: idx, viewMode: 'card' }))} className={`w-full text-left px-3.5 py-3 rounded-xl transition-all mb-1 group ${idx === state.currentIndex && state.viewMode === 'card' ? 'bg-indigo-500/10 text-indigo-400' : 'text-slate-500 hover:bg-slate-800'}`}>
                 <div className="truncate text-xs font-medium">{w.word}</div>
               </button>
             ))}
@@ -232,7 +231,7 @@ const App: React.FC = () => {
         </div>
 
         <div className="p-4 border-t border-slate-800 bg-slate-900/50">
-          <button onClick={() => setState(p => ({...p, isSettingsOpen: true}))} className="w-full flex items-center justify-center space-x-2 py-3 bg-slate-800 border border-slate-700 rounded-xl text-slate-300 hover:bg-slate-700"><Settings size={16} /><span className="font-bold text-xs uppercase tracking-widest">Settings</span></button>
+          <button onClick={() => setState(p => ({ ...p, isSettingsOpen: true }))} className="w-full flex items-center justify-center space-x-2 py-3 bg-slate-800 border border-slate-700 rounded-xl text-slate-300 hover:bg-slate-700"><Settings size={16} /><span className="font-bold text-xs uppercase tracking-widest">Settings</span></button>
         </div>
       </aside>
 
@@ -243,21 +242,21 @@ const App: React.FC = () => {
             <LanguageSelector label="EN" sheets={englishSheets} type="en" active={currentSheet?.lang === 'en-US'} />
             <LanguageSelector label="TW" sheets={taiwaneseSheets} type="tw" active={currentSheet?.lang === 'zh-TW'} />
           </div>
-          
-          <div className="flex items-center space-x-3 flex-shrink-0">
-             {state.viewMode === 'card' && (
-               <button 
-                onClick={() => setIsAssistantOpenMobile(!isAssistantOpenMobile)} 
-                className={`p-2.5 rounded-xl border transition-all ${isAssistantOpenMobile ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-800 text-indigo-400 shadow-lg shadow-indigo-600/10 hover:bg-slate-800'} ${isAssistantOpenMobile ? '' : 'lg:hidden'}`}
-               >
-                 <Sparkles size={20} />
-               </button>
-             )}
 
-             <div className="hidden sm:flex bg-slate-900 p-1 rounded-xl border border-slate-800">
-               <button onClick={() => setState(p => ({...p, viewMode: 'card'}))} className={`px-4 py-1.5 rounded-lg text-[11px] font-bold ${state.viewMode === 'card' ? 'bg-slate-800 text-indigo-400' : 'text-slate-500 hover:text-slate-400'}`}>CARD</button>
-               <button onClick={() => setState(p => ({...p, viewMode: 'list'}))} className={`px-4 py-1.5 rounded-lg text-[11px] font-bold ${state.viewMode === 'list' ? 'bg-slate-800 text-indigo-400' : 'text-slate-500 hover:text-slate-400'}`}>LIST</button>
-             </div>
+          <div className="flex items-center space-x-3 flex-shrink-0">
+            {state.viewMode === 'card' && (
+              <button
+                onClick={() => setIsAssistantOpenMobile(!isAssistantOpenMobile)}
+                className={`p-2.5 rounded-xl border transition-all ${isAssistantOpenMobile ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-800 text-indigo-400 shadow-lg shadow-indigo-600/10 hover:bg-slate-800'} ${isAssistantOpenMobile ? '' : 'lg:hidden'}`}
+              >
+                <Sparkles size={20} />
+              </button>
+            )}
+
+            <div className="hidden sm:flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+              <button onClick={() => setState(p => ({ ...p, viewMode: 'card' }))} className={`px-4 py-1.5 rounded-lg text-[11px] font-bold ${state.viewMode === 'card' ? 'bg-slate-800 text-indigo-400' : 'text-slate-500 hover:text-slate-400'}`}>CARD</button>
+              <button onClick={() => setState(p => ({ ...p, viewMode: 'list' }))} className={`px-4 py-1.5 rounded-lg text-[11px] font-bold ${state.viewMode === 'list' ? 'bg-slate-800 text-indigo-400' : 'text-slate-500 hover:text-slate-400'}`}>LIST</button>
+            </div>
           </div>
         </header>
 
@@ -273,25 +272,32 @@ const App: React.FC = () => {
                 <div className="p-4 bg-red-500/10 rounded-full mb-6"><AlertCircle className="text-red-500" size={48} /></div>
                 <h3 className="text-xl font-bold mb-2">データの読み込みに失敗しました</h3>
                 <p className="text-slate-500 text-sm max-w-xs mb-8">スプレッドシートが「ウェブに公開」されていることを確認してください。</p>
-                <button onClick={() => setState(p => ({...p, isSettingsOpen: true}))} className="px-6 py-3 bg-slate-800 rounded-xl text-xs font-bold">設定を確認する</button>
+                <button onClick={() => setState(p => ({ ...p, isSettingsOpen: true }))} className="px-6 py-3 bg-slate-800 rounded-xl text-xs font-bold">設定を確認する</button>
               </div>
             ) : state.viewMode === 'card' ? (
-              currentWord && <WordCard item={currentWord} lang={currentSheet?.lang} onNext={() => setState(p => ({...p, currentIndex: Math.min(displayWords.length-1, p.currentIndex+1)}))} onPrev={() => setState(p => ({...p, currentIndex: Math.max(0, p.currentIndex-1)}))} isFirst={state.currentIndex === 0} isLast={state.currentIndex === displayWords.length-1} />
+              currentWord && <WordCard
+                item={currentWord}
+                lang={currentSheet?.lang}
+                currentIndex={state.currentIndex}
+                totalCount={displayWords.length}
+                onNext={() => setState(p => ({ ...p, currentIndex: (p.currentIndex + 1) % displayWords.length }))}
+                onPrev={() => setState(p => ({ ...p, currentIndex: (p.currentIndex - 1 + displayWords.length) % displayWords.length }))}
+              />
             ) : (
-              <WordList words={displayWords} lang={currentSheet?.lang} onSelectWord={(idx) => setState(p => ({...p, currentIndex: idx, viewMode: 'card'}))} />
+              <WordList words={displayWords} lang={currentSheet?.lang} onSelectWord={(idx) => setState(p => ({ ...p, currentIndex: idx, viewMode: 'card' }))} />
             )}
           </div>
 
           <div className={`fixed inset-0 z-50 lg:relative lg:inset-auto lg:z-0 lg:w-96 bg-slate-900 border-l border-slate-800 transition-transform duration-300 ${isAssistantOpenMobile ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'} lg:block ${state.viewMode === 'card' ? 'block' : 'hidden'}`}>
-             {isAssistantOpenMobile && (
-               <button 
-                 onClick={() => setIsAssistantOpenMobile(false)}
-                 className="absolute top-4 right-4 z-[60] p-2 bg-slate-800 text-slate-400 rounded-full lg:hidden"
-               >
-                 <X size={20} />
-               </button>
-             )}
-             {currentWord && <GeminiAssistant key={currentWord.id + currentWord.word} currentWord={currentWord} lang={currentSheet?.lang} />}
+            {isAssistantOpenMobile && (
+              <button
+                onClick={() => setIsAssistantOpenMobile(false)}
+                className="absolute top-4 right-4 z-[60] p-2 bg-slate-800 text-slate-400 rounded-full lg:hidden"
+              >
+                <X size={20} />
+              </button>
+            )}
+            {currentWord && <GeminiAssistant key={currentWord.id + currentWord.word} currentWord={currentWord} lang={currentSheet?.lang} />}
           </div>
         </div>
       </main>
@@ -301,9 +307,9 @@ const App: React.FC = () => {
           <div className="bg-slate-900 w-full max-w-2xl rounded-[2.5rem] border border-slate-800 shadow-2xl p-6 sm:p-8 flex flex-col max-h-[95vh] animate-in zoom-in-95">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-black flex items-center space-x-3"><Settings className="text-indigo-500" /><span>Cloud Settings</span></h2>
-              <button onClick={() => setState(p => ({...p, isSettingsOpen: false}))} className="p-2 text-slate-500 hover:bg-slate-800 rounded-full"><X size={24} /></button>
+              <button onClick={() => setState(p => ({ ...p, isSettingsOpen: false }))} className="p-2 text-slate-500 hover:bg-slate-800 rounded-full"><X size={24} /></button>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto space-y-8 pr-2 custom-scrollbar">
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center space-x-2"><Link2 size={12} /><span>Spreadsheet URL</span></label>
@@ -330,19 +336,19 @@ const App: React.FC = () => {
                       const allIndex = state.sheets.findIndex(os => os.gid === s.gid && os.name === s.name);
                       return (
                         <div key={s.gid + s.name} className="flex items-center gap-3 p-3 bg-slate-950 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors">
-                          <input 
-                            type="text" 
-                            value={s.name} 
-                            onChange={(e) => updateSheetRow(allIndex, { name: e.target.value })} 
-                            className="flex-1 bg-slate-900 px-3 py-2 rounded-xl text-xs font-bold border border-slate-800 focus:border-indigo-500 outline-none" 
-                            placeholder="Name" 
+                          <input
+                            type="text"
+                            value={s.name}
+                            onChange={(e) => updateSheetRow(allIndex, { name: e.target.value })}
+                            className="flex-1 bg-slate-900 px-3 py-2 rounded-xl text-xs font-bold border border-slate-800 focus:border-indigo-500 outline-none"
+                            placeholder="Name"
                           />
-                          <input 
-                            type="text" 
-                            value={s.gid} 
-                            onChange={(e) => updateSheetRow(allIndex, { gid: e.target.value })} 
-                            className="w-20 sm:w-28 bg-slate-900 px-3 py-2 rounded-xl text-[10px] font-mono border border-slate-800 focus:border-indigo-500 outline-none" 
-                            placeholder="GID" 
+                          <input
+                            type="text"
+                            value={s.gid}
+                            onChange={(e) => updateSheetRow(allIndex, { gid: e.target.value })}
+                            className="w-20 sm:w-28 bg-slate-900 px-3 py-2 rounded-xl text-[10px] font-mono border border-slate-800 focus:border-indigo-500 outline-none"
+                            placeholder="GID"
                           />
                           <button onClick={() => removeSheetRow(s.gid)} className="p-2 text-slate-700 hover:text-red-500 transition-colors">
                             <Trash2 size={16} />
@@ -361,8 +367,8 @@ const App: React.FC = () => {
                   <Sparkles size={14} className="text-indigo-400" />
                   <span>Cache Management</span>
                 </span>
-                <button 
-                  onClick={handleClearCache} 
+                <button
+                  onClick={handleClearCache}
                   disabled={isRefreshing}
                   className="w-full sm:w-auto px-5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-[10px] font-black text-slate-300 hover:bg-slate-700 transition-all flex items-center justify-center space-x-2"
                 >
@@ -371,7 +377,7 @@ const App: React.FC = () => {
                 </button>
               </div>
             </div>
-            
+
             <button onClick={handleApplySettings} className="w-full py-4 mt-6 bg-white text-slate-950 rounded-2xl font-black text-sm tracking-[0.1em] uppercase shadow-2xl active:scale-[0.98]">SAVE & CONNECT</button>
           </div>
         </div>
