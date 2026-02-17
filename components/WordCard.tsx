@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { WordItem } from '../types';
-import { Volume2, Lightbulb, ChevronRight, ChevronLeft, Quote } from 'lucide-react';
+import { Volume2, Lightbulb, ChevronRight, ChevronLeft, Quote, Star } from 'lucide-react';
 import { useSpeech } from '../hooks/useSpeech';
 
 interface WordCardProps {
@@ -12,9 +12,12 @@ interface WordCardProps {
   totalCount: number;
   lang?: string;
   onSpeechComplete?: () => void;
+  autoPlayTrigger?: number;
+  isBookmarked?: boolean;
+  onToggleBookmark?: () => void;
 }
 
-const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex, totalCount, lang = 'en-US', onSpeechComplete }) => {
+const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex, totalCount, lang = 'en-US', onSpeechComplete, autoPlayTrigger, isBookmarked, onToggleBookmark }) => {
   const { speak, cancel } = useSpeech();
 
   const speakText = (text: string) => {
@@ -42,7 +45,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
       if (timeoutId) clearTimeout(timeoutId);
       cancel();
     };
-  }, [item.word, lang]);
+  }, [item.word, lang, autoPlayTrigger]);
 
   const handleManualSpeak = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -75,12 +78,22 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
                 {item.word}
               </h2>
             </div>
-            <button
-              onClick={handleManualSpeak}
-              className="p-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-xl shadow-indigo-600/20 transition-all active:scale-95 flex-shrink-0 mt-1"
-            >
-              <Volume2 size={20} strokeWidth={2.5} />
-            </button>
+            <div className="flex items-center space-x-2">
+              {onToggleBookmark && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }}
+                  className={`p-3 rounded-xl shadow-xl transition-all active:scale-95 flex-shrink-0 mt-1 ${isBookmarked ? 'bg-amber-500 text-white shadow-amber-500/20' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+                >
+                  <Star size={20} strokeWidth={isBookmarked ? 2.5 : 2} fill={isBookmarked ? "currentColor" : "none"} />
+                </button>
+              )}
+              <button
+                onClick={handleManualSpeak}
+                className="p-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-xl shadow-indigo-600/20 transition-all active:scale-95 flex-shrink-0 mt-1"
+              >
+                <Volume2 size={20} strokeWidth={2.5} />
+              </button>
+            </div>
           </div>
 
           {/* Divider Margin: mb-6 -> mb-3 */}

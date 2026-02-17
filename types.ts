@@ -31,6 +31,9 @@ export interface AppState {
   viewMode: ViewMode;
   isAutoPlay?: boolean;
   isShuffle?: boolean;
+  autoPlayTrigger?: number;
+  isFavoritesOnly?: boolean;
+  bookmarks?: Set<string>; // Not in state usually if we use a separate state... wait, let's put it in state for easiest management
 }
 
 // AI Studioのグローバルプロパティを型定義

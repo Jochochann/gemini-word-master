@@ -1,13 +1,13 @@
 
 import React from 'react';
 import { WordItem } from '../types';
-import { 
-  Search, 
-  ExternalLink, 
-  Image as ImageIcon, 
-  Book, 
-  Globe, 
-  MessageSquare, 
+import {
+  Search,
+  ExternalLink,
+  Image as ImageIcon,
+  Book,
+  Globe,
+  MessageSquare,
   Languages,
   BookOpen,
   Sparkles
@@ -55,15 +55,8 @@ const GeminiAssistant: React.FC<SearchAssistantProps> = ({ currentWord, lang = '
 
   return (
     <div className="flex flex-col h-full bg-slate-900 overflow-hidden border-l border-slate-800">
-      <div className="p-6 border-b border-slate-800 bg-slate-950/30 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-indigo-500/10 rounded-lg">
-            <Sparkles className="text-indigo-400" size={20} />
-          </div>
-          <h3 className="font-black text-xs tracking-[0.2em] text-slate-300 uppercase">Assistant</h3>
-        </div>
-      </div>
-      
+
+
       <div className="flex-1 overflow-y-auto p-6 space-y-8 custom-scrollbar">
         <div className="p-8 bg-gradient-to-br from-indigo-900/40 to-slate-950 rounded-[2rem] border border-indigo-500/20 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-700" />
@@ -76,9 +69,9 @@ const GeminiAssistant: React.FC<SearchAssistantProps> = ({ currentWord, lang = '
           <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.3em] ml-1">Learning Resources</p>
           <div className="space-y-3">
             {getSearchResources().map((res) => (
-              <button 
-                key={res.id} 
-                onClick={() => openSearch(res.url)} 
+              <button
+                key={res.id}
+                onClick={() => openSearch(res.url)}
                 className="w-full text-left p-5 bg-slate-950/40 hover:bg-slate-800 border border-slate-800/80 rounded-[1.5rem] transition-all group flex items-start space-x-5 hover:border-slate-700"
               >
                 <div className="p-3 bg-slate-900 rounded-xl group-hover:bg-slate-950 transition-colors">
