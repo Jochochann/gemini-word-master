@@ -343,7 +343,13 @@ const App: React.FC = () => {
                 onToggleBookmark={() => toggleBookmark(currentWord.id)}
               />
             ) : (
-              <WordList words={displayWords} lang={currentSheet?.lang} onSelectWord={(idx) => setState(p => ({ ...p, currentIndex: idx, viewMode: 'card' }))} />
+              <WordList
+                words={displayWords}
+                lang={currentSheet?.lang}
+                onSelectWord={(idx) => setState(p => ({ ...p, currentIndex: idx, viewMode: 'card' }))}
+                bookmarks={bookmarks}
+                onToggleBookmark={toggleBookmark}
+              />
             )}
           </div>
 

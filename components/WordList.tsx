@@ -1,16 +1,18 @@
 
 import React, { useState } from 'react';
 import { WordItem } from '../types';
-import { Volume2, Search, ArrowRight, Hash } from 'lucide-react';
+import { Volume2, Search, ArrowRight, Hash, Star } from 'lucide-react';
 import { useSpeech } from '../hooks/useSpeech';
 
 interface WordListProps {
   words: WordItem[];
   onSelectWord: (index: number) => void;
   lang?: string;
+  bookmarks: Set<string>;
+  onToggleBookmark: (id: string, e: React.MouseEvent) => void;
 }
 
-const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US' }) => {
+const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US', bookmarks, onToggleBookmark }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const { speak } = useSpeech();
 
@@ -52,10 +54,9 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
           <table className="w-full text-left border-collapse table-fixed">
             <thead>
               <tr className="bg-slate-900/95 border-b border-slate-700 sticky top-0 z-10 backdrop-blur-xl">
-                <th className="px-4 py-4 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] w-1/3">Word</th>
-                <th className="px-4 py-4 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] w-1/3">Meaning</th>
-                <th className="px-4 py-4 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] hidden sm:table-cell w-1/3">Example</th>
-                <th className="px-4 py-4 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] w-20 text-center">Action</th>
+                <th className="px-6 py-4 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] w-1/2 sm:w-1/3">Word</th>
+                <th className="px-6 py-4 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] hidden sm:table-cell w-1/2 sm:w-2/3">Example</th>
+                <th className="px-4 py-4 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] w-20 text-center">Save</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/50">
@@ -63,7 +64,7 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
                 const originalIndex = words.findIndex((ow: WordItem) => ow.id === w.id);
                 return (
                   <tr key={w.id} className="hover:bg-indigo-500/5 transition-all group/row">
-                    <td className="px-4 py-3">
+                    <td className="px-6 py-3">
                       <button
                         onClick={() => onSelectWord(originalIndex)}
                         className="font-bold text-base text-white group-hover/row:text-indigo-400 transition-colors text-left leading-tight truncate w-full block"
@@ -71,10 +72,7 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
                         {w.word}
                       </button>
                     </td>
-                    <td className="px-4 py-3">
-                      <span className="text-sm text-slate-200 font-medium truncate block w-full">{w.translation}</span>
-                    </td>
-                    <td className="px-4 py-3 hidden sm:table-cell">
+                    <td className="px-6 py-3 hidden sm:table-cell">
                       <p className="text-xs text-slate-400 italic font-medium truncate block w-full group-hover/row:text-slate-300 transition-colors">
                         {w.example || '-'}
                       </p>
@@ -82,10 +80,10 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center space-x-2">
                         <button
-                          onClick={() => speakWord(w.word)}
-                          className="p-2.5 text-slate-400 hover:text-indigo-400 hover:bg-indigo-400/10 rounded-xl transition-all"
+                          onClick={(e) => onToggleBookmark(w.id, e)}
+                          className={`p-2 rounded-lg transition-all ${bookmarks.has(w.id) ? 'text-amber-400 bg-amber-400/10' : 'text-slate-600 hover:text-amber-400 hover:bg-slate-800'}`}
                         >
-                          <Volume2 size={20} />
+                          <Star size={18} fill={bookmarks.has(w.id) ? "currentColor" : "none"} strokeWidth={bookmarks.has(w.id) ? 2.5 : 2} />
                         </button>
                       </div>
                     </td>
@@ -94,7 +92,7 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
               })}
               {filteredWords.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="py-20 text-center text-slate-600 font-medium italic">
+                  <td colSpan={3} className="py-20 text-center text-slate-600 font-medium italic">
                     No words found matching your search...
                   </td>
                 </tr>
