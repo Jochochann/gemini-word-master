@@ -316,7 +316,7 @@ const App: React.FC = () => {
         </header>
 
         <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative">
-          <div className="flex-1 overflow-y-auto pt-8 pb-40 lg:pb-32 custom-scrollbar">
+          <div className={`flex-1 ${state.viewMode === 'list' ? 'flex flex-col overflow-hidden' : 'overflow-y-auto pt-8 pb-40 lg:pb-32 custom-scrollbar'}`}>
             {(isQueryLoading && displayWords.length === 0) ? (
               <div className="flex flex-col items-center py-20 animate-pulse">
                 <Loader2 className="text-indigo-500 animate-spin mb-6" size={48} />
