@@ -33,6 +33,7 @@ export const fetchSpreadsheetWords = async (id: string, gid: string): Promise<Wo
             id: (idx + 1).toString(),
             word: parts[1] || '',
             translation: parts[2] || '',
+            definition: parts[2] || '', // Fallback for UI
             example: parts[3] || '',
             notes: parts[4] || ''
         };

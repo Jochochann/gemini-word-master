@@ -201,28 +201,28 @@ const App: React.FC = () => {
       {isSidebarOpen && <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />}
 
       <aside className={`fixed inset-y-0 left-0 z-50 bg-slate-900 border-r border-slate-800 transition-transform duration-300 flex flex-col w-72 lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-6 flex items-center justify-between border-b border-slate-800 flex-shrink-0">
+        <div className="p-6 flex items-center justify-between border-b border-slate-800/50 flex-shrink-0">
           <div className="flex items-center space-x-2.5 group">
-            <div className="bg-indigo-600 p-2 rounded-xl text-white shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform"><BookOpen size={20} /></div>
+            <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 p-2 rounded-xl text-white shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform"><BookOpen size={20} /></div>
             <h1 className="font-bold text-lg text-slate-100 tracking-tight">Word Master</h1>
           </div>
-          <button onClick={() => setIsSidebarOpen(false)} className="p-1.5 hover:bg-slate-800 rounded-lg lg:hidden"><X size={20} /></button>
+          <button onClick={() => setIsSidebarOpen(false)} className="p-1.5 hover:bg-slate-800 rounded-lg lg:hidden text-slate-400 hover:text-white"><X size={20} /></button>
         </div>
         <div ref={sidebarContainerRef} className="p-4 overflow-y-auto flex-1 custom-scrollbar">
           <nav className="space-y-1.5">
-            <button onClick={() => setState(p => ({ ...p, viewMode: 'card', isFavoritesOnly: false }))} className={`w-full text-left px-4 py-3.5 rounded-xl transition-all flex items-center space-x-3 mb-2 ${state.viewMode === 'card' && !state.isFavoritesOnly ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:bg-slate-800'}`}><Play size={18} /><span className="font-bold text-sm">カード学習</span></button>
-            <button onClick={() => setState(p => ({ ...p, viewMode: 'list', isFavoritesOnly: false }))} className={`w-full text-left px-4 py-3.5 rounded-xl transition-all flex items-center space-x-3 mb-2 ${state.viewMode === 'list' && !state.isFavoritesOnly ? 'bg-slate-700 text-white' : 'text-slate-400 hover:bg-slate-800'}`}><LayoutGrid size={18} /><span className="font-bold text-sm">単語一覧</span></button>
-            <button onClick={() => setState(p => ({ ...p, viewMode: 'card', isFavoritesOnly: true, currentIndex: 0 }))} className={`w-full text-left px-4 py-3.5 rounded-xl transition-all flex items-center space-x-3 mb-2 ${state.isFavoritesOnly ? 'bg-amber-500/20 text-amber-400' : 'text-slate-400 hover:bg-slate-800'}`}><Star size={18} /><span className="font-bold text-sm">苦手・保存済み</span></button>
+            <button onClick={() => setState(p => ({ ...p, viewMode: 'card', isFavoritesOnly: false }))} className={`w-full text-left px-4 py-3.5 rounded-xl transition-all flex items-center space-x-3 mb-2 ${state.viewMode === 'card' && !state.isFavoritesOnly ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}><Play size={18} className={state.viewMode === 'card' && !state.isFavoritesOnly ? 'text-white' : 'text-indigo-400'} /><span className="font-bold text-sm">カード学習</span></button>
+            <button onClick={() => setState(p => ({ ...p, viewMode: 'list', isFavoritesOnly: false }))} className={`w-full text-left px-4 py-3.5 rounded-xl transition-all flex items-center space-x-3 mb-2 ${state.viewMode === 'list' && !state.isFavoritesOnly ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}><LayoutGrid size={18} className={state.viewMode === 'list' && !state.isFavoritesOnly ? 'text-white' : 'text-indigo-400'} /><span className="font-bold text-sm">単語一覧</span></button>
+            <button onClick={() => setState(p => ({ ...p, viewMode: 'card', isFavoritesOnly: true, currentIndex: 0 }))} className={`w-full text-left px-4 py-3.5 rounded-xl transition-all flex items-center space-x-3 mb-2 ${state.isFavoritesOnly ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}><Star size={18} className={state.isFavoritesOnly ? 'text-white' : 'text-amber-500'} /><span className="font-bold text-sm">苦手・保存済み</span></button>
             <div className="h-px bg-slate-800 w-full mb-4" />
-            <div className="px-3 py-2 mb-2 flex items-center justify-between sticky top-0 bg-slate-900/95 backdrop-blur z-10 -mx-2 rounded-xl">
-              <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Vocabulary List</span>
+            <div className="px-3 py-2.5 mb-2 flex items-center justify-between sticky top-0 bg-slate-900/95 backdrop-blur z-10 -mx-2 rounded-xl">
+              <span className="text-xs font-black text-indigo-400 uppercase tracking-widest">Vocabulary List</span>
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => sidebarContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className="p-1 text-slate-600 hover:text-indigo-400 hover:bg-slate-800 rounded transition-all"
+                  className="p-1.5 text-slate-400 hover:text-white hover:bg-indigo-600 rounded-lg transition-all"
                   title="Scroll to Top"
                 >
-                  <ArrowUpToLine size={12} />
+                  <ArrowUpToLine size={14} />
                 </button>
                 {(isRefetching || isQueryLoading) && <Loader2 size={12} className="animate-spin text-indigo-500" />}
               </div>
@@ -232,10 +232,10 @@ const App: React.FC = () => {
                 key={w.id}
                 ref={(el) => { sidebarRefs.current[idx] = el; }}
                 onClick={() => setState(p => ({ ...p, currentIndex: idx, viewMode: 'card' }))}
-                className={`w-full text-left px-3.5 py-3 rounded-xl transition-all mb-1 group ${idx === state.currentIndex && state.viewMode === 'card' ? 'bg-indigo-500/10 text-indigo-400' : 'text-slate-500 hover:bg-slate-800'}`}
+                className={`w-full text-left px-3.5 py-3 rounded-xl transition-all mb-1 group ${idx === state.currentIndex && state.viewMode === 'card' ? 'bg-slate-800/80 text-white border-l-2 border-indigo-500 shadow-md' : 'text-slate-300 hover:text-white hover:bg-slate-800/50'}`}
               >
                 <div className="flex items-center justify-between w-full">
-                  <div className="truncate text-xs font-medium">{w.word}</div>
+                  <div className="truncate text-sm font-medium tracking-wide">{w.word}</div>
                   {bookmarks.has(w.id) && <Star size={10} className="text-amber-400 fill-amber-400 flex-shrink-0 ml-2" />}
                 </div>
               </button>
@@ -362,15 +362,15 @@ const App: React.FC = () => {
 
         {/* Mobile Bottom Bar for Controls */}
         {state.viewMode === 'card' && (
-          <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-slate-950/80 backdrop-blur-md border-t border-slate-800 z-40 flex justify-around items-center safe-area-bottom">
+          <div className="lg:hidden fixed bottom-0 left-0 right-0 px-6 py-4 bg-slate-950/90 backdrop-blur-xl border-t border-slate-800 z-40 flex justify-between items-center safe-area-bottom">
             <button
               onClick={() => setState(p => ({ ...p, isShuffle: !p.isShuffle, currentIndex: 0 }))}
-              className={`flex flex-col items-center space-y-1 ${state.isShuffle ? 'text-indigo-500' : 'text-slate-500'}`}
+              className={`flex flex-col items-center space-y-1.5 ${state.isShuffle ? 'text-indigo-400' : 'text-slate-400'}`}
             >
-              <div className={`p-2 rounded-full ${state.isShuffle ? 'bg-indigo-500/20' : 'bg-slate-800/50'}`}>
-                <Shuffle size={20} />
+              <div className={`p-2.5 rounded-2xl transition-all ${state.isShuffle ? 'bg-indigo-500/20 shadow-lg shadow-indigo-500/10' : 'bg-slate-800/50'}`}>
+                <Shuffle size={22} strokeWidth={state.isShuffle ? 2.5 : 2} />
               </div>
-              <span className="text-[10px] font-bold">Shuffle</span>
+              <span className="text-[11px] font-bold tracking-wide">Shuffle</span>
             </button>
 
             <button
@@ -379,22 +379,22 @@ const App: React.FC = () => {
                 isAutoPlay: !p.isAutoPlay,
                 autoPlayTrigger: !p.isAutoPlay ? Date.now() : p.autoPlayTrigger
               }))}
-              className={`flex flex-col items-center space-y-1 ${state.isAutoPlay ? 'text-indigo-500' : 'text-slate-500'}`}
+              className={`flex flex-col items-center space-y-1.5 ${state.isAutoPlay ? 'text-indigo-400' : 'text-slate-400'}`}
             >
-              <div className={`p-2 rounded-full ${state.isAutoPlay ? 'bg-indigo-500/20' : 'bg-slate-800/50'}`}>
-                <MonitorPlay size={20} />
+              <div className={`p-2.5 rounded-2xl transition-all ${state.isAutoPlay ? 'bg-indigo-500/20 shadow-lg shadow-indigo-500/10' : 'bg-slate-800/50'}`}>
+                <MonitorPlay size={22} strokeWidth={state.isAutoPlay ? 2.5 : 2} />
               </div>
-              <span className="text-[10px] font-bold">Auto-Play</span>
+              <span className="text-[11px] font-bold tracking-wide">Auto-Play</span>
             </button>
 
             <button
               onClick={() => setIsAssistantOpenMobile(!isAssistantOpenMobile)}
-              className={`flex flex-col items-center space-y-1 ${isAssistantOpenMobile ? 'text-indigo-500' : 'text-slate-500'}`}
+              className={`flex flex-col items-center space-y-1.5 ${isAssistantOpenMobile ? 'text-indigo-400' : 'text-slate-400'}`}
             >
-              <div className={`p-2 rounded-full ${isAssistantOpenMobile ? 'bg-indigo-500/20' : 'bg-slate-800/50'}`}>
-                <Search size={20} />
+              <div className={`p-2.5 rounded-2xl transition-all ${isAssistantOpenMobile ? 'bg-indigo-500/20 shadow-lg shadow-indigo-500/10' : 'bg-slate-800/50'}`}>
+                <Search size={22} strokeWidth={isAssistantOpenMobile ? 2.5 : 2} />
               </div>
-              <span className="text-[10px] font-bold">Search</span>
+              <span className="text-[11px] font-bold tracking-wide">Search</span>
             </button>
           </div>
         )}

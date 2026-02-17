@@ -28,7 +28,7 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div className="space-y-2">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-1 h-indigo-500 rounded-full" />
+            <div className="w-10 h-1 bg-indigo-500 rounded-full" />
             <h2 className="text-3xl font-black text-slate-100 tracking-tight uppercase">Library</h2>
           </div>
           <p className="text-slate-500 text-sm font-medium tracking-wide">
@@ -51,12 +51,12 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
         <div className="overflow-x-auto overflow-y-auto max-h-full custom-scrollbar">
           <table className="w-full text-left border-collapse min-w-[500px]">
             <thead>
-              <tr className="bg-slate-900/80 border-b border-slate-800 sticky top-0 z-10 backdrop-blur-xl">
-                <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-center w-20">#</th>
-                <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Word</th>
-                <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Meaning</th>
-                <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] hidden sm:table-cell">Example</th>
-                <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] w-32 text-center">Action</th>
+              <tr className="bg-slate-900/95 border-b border-slate-700 sticky top-0 z-10 backdrop-blur-xl">
+                <th className="px-6 py-5 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] text-center w-20">#</th>
+                <th className="px-6 py-5 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">Word</th>
+                <th className="px-6 py-5 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">Meaning</th>
+                <th className="px-6 py-5 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] hidden sm:table-cell">Example</th>
+                <th className="px-6 py-5 text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] w-32 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/50">
@@ -70,16 +70,16 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
                     <td className="px-6 py-6">
                       <button
                         onClick={() => onSelectWord(originalIndex)}
-                        className="font-bold text-lg text-slate-200 group-hover/row:text-indigo-400 transition-colors text-left leading-tight"
+                        className="font-bold text-lg text-white group-hover/row:text-indigo-400 transition-colors text-left leading-tight"
                       >
                         {w.word}
                       </button>
                     </td>
                     <td className="px-6 py-6">
-                      <span className="text-sm sm:text-base text-slate-400 font-medium">{w.translation}</span>
+                      <span className="text-sm sm:text-base text-slate-200 font-medium">{w.translation}</span>
                     </td>
                     <td className="px-6 py-6 hidden sm:table-cell">
-                      <p className="text-sm text-slate-600 italic font-medium max-w-[200px] lg:max-w-md truncate group-hover/row:text-slate-500 transition-colors">
+                      <p className="text-sm text-slate-400 italic font-medium max-w-[200px] lg:max-w-md truncate group-hover/row:text-slate-300 transition-colors">
                         {w.example || '-'}
                       </p>
                     </td>

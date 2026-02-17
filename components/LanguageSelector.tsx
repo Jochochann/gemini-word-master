@@ -29,13 +29,13 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         <div className="relative flex-shrink-0">
             <button
                 onClick={() => setOpenDropdown(openDropdown === type ? null : type)}
-                className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl border transition-all text-xs font-bold whitespace-nowrap ${active
-                        ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20'
-                        : 'bg-slate-900 border-slate-800 text-slate-500 hover:bg-slate-800 hover:text-slate-300'
+                className={`flex items-center space-x-2 px-3.5 py-2.5 rounded-xl border transition-all text-sm font-bold whitespace-nowrap ${active
+                    ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20'
+                    : 'bg-slate-900 border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
                     }`}
             >
-                <span className="tracking-widest uppercase">{label}</span>
-                {active && <span className="opacity-80 font-medium truncate max-w-[60px] sm:max-w-[100px]">| {currentSheetName}</span>}
+                <span className="tracking-wide uppercase">{label}</span>
+                {active && <span className="opacity-90 font-medium truncate max-w-[80px] sm:max-w-[120px]">| {currentSheetName}</span>}
                 <ChevronDown size={14} className={`transition-transform flex-shrink-0 ${openDropdown === type ? 'rotate-180' : ''}`} />
             </button>
 

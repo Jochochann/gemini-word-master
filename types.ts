@@ -3,7 +3,11 @@ export interface WordItem {
   id: string;
   word: string;
   translation: string;
+  definition?: string;
+  partOfSpeech?: string;
+  pronunciation?: string;
   example?: string;
+  exampleTranslation?: string;
   notes?: string;
 }
 

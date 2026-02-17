@@ -70,11 +70,18 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
         <div className="relative z-10 flex flex-col h-full overflow-hidden">
           {/* Header Margin: mb-4 -> mb-2 */}
           <div className="flex justify-between items-start mb-2 flex-shrink-0">
-            <div className="flex flex-col min-w-0">
-              <span className="text-[9px] font-black text-indigo-400 bg-indigo-400/10 px-2 py-1 rounded-full uppercase tracking-[0.2em] mb-2 w-fit border border-indigo-400/20">
-                {lang === 'zh-TW' ? 'Taiwanese' : 'English'}
-              </span>
-              <h2 className="text-4xl sm:text-5xl font-black text-slate-50 tracking-tight break-words pr-4 leading-tight">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center space-x-3 mb-1">
+                {item.partOfSpeech && (
+                  <span className="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 text-[10px] font-black tracking-widest uppercase border border-indigo-500/30">
+                    {item.partOfSpeech}
+                  </span>
+                )}
+                {item.pronunciation && (
+                  <span className="text-slate-400 text-xs font-mono tracking-tight opacity-80">/{item.pronunciation}/</span>
+                )}
+              </div>
+              <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-tight drop-shadow-sm">
                 {item.word}
               </h2>
             </div>
@@ -100,39 +107,39 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
           <div className="h-px bg-slate-800/50 w-full mb-3 flex-shrink-0" />
 
           {/* Content Area space-y: space-y-5 -> space-y-3 */}
-          <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
-            <p className="text-2xl sm:text-4xl font-bold text-indigo-300 leading-tight">
-              {item.translation}
-            </p>
+          <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4">
 
-            {item.example && (
-              /* Example Box: Reduced padding and integrated header */
-              <div className="bg-slate-950/40 p-4 rounded-2xl border border-slate-800/50 relative backdrop-blur-sm">
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center space-x-2">
-                    <Quote className="text-slate-600" size={14} />
-                    <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">Example</span>
-                  </div>
-                  {lang !== 'zh-TW' && (
-                    <button
-                      onClick={handleSpeakExample}
-                      className="p-1 text-slate-500 hover:text-indigo-400 transition-all"
-                    >
-                      <Volume2 size={16} />
-                    </button>
-                  )}
-                </div>
-                <p className="text-base sm:text-xl text-slate-300 italic font-medium leading-snug">
-                  {item.example}
+            {/* Definition / Meaning Box */}
+            <div className="bg-slate-900/50 rounded-2xl p-6 border border-slate-800/50 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-3 opacity-10">
+                <Lightbulb size={48} className="text-amber-400" />
+              </div>
+              <div className="flex items-start space-x-3 relative z-10">
+                <Lightbulb className="text-amber-400 flex-shrink-0 mt-1" size={20} />
+                <p className="text-xl sm:text-2xl font-bold text-indigo-100 leading-relaxed tracking-wide">
+                  {item.definition || item.translation}
                 </p>
+              </div>
+            </div>
+
+            {/* Example Box */}
+            {item.example && (
+              <div className="flex items-start space-x-3 p-5 rounded-2xl bg-slate-800/30 border border-slate-800/30 hover:bg-slate-800/50 transition-colors">
+                <Quote className="text-slate-500 flex-shrink-0 mt-1" size={18} />
+                <div className="space-y-3">
+                  <p className="text-lg sm:text-xl text-slate-300 italic font-medium leading-relaxed font-serif">"{item.example}"</p>
+                  {item.exampleTranslation && <p className="text-slate-500 text-sm border-t border-slate-700/50 pt-2">{item.exampleTranslation}</p>}
+                </div>
               </div>
             )}
 
+            {/* Notes */}
             {item.notes && (
-              /* Notes: Reduced padding and space */
-              <div className="flex items-start space-x-2.5 p-4 bg-amber-500/5 rounded-2xl border border-amber-500/10">
-                <Lightbulb size={16} className="text-amber-500 mt-1 flex-shrink-0" />
-                <p className="text-sm sm:text-lg text-slate-400 leading-snug font-medium">
+              <div className="flex items-start space-x-3 p-4 bg-amber-500/5 rounded-2xl border border-amber-500/10">
+                <div className="bg-amber-500/10 p-1.5 rounded-lg">
+                  <Lightbulb size={14} className="text-amber-500" />
+                </div>
+                <p className="text-sm sm:text-base text-slate-400 leading-relaxed font-medium mt-0.5">
                   {item.notes}
                 </p>
               </div>
@@ -156,21 +163,21 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
       </div>
 
       {/* Mobile Navigation */}
-      <div className="mt-6 flex sm:hidden justify-center items-center space-x-8">
+      <div className="mt-8 flex sm:hidden justify-center items-center space-x-6 pb-4">
         <button
           onClick={onPrev}
-          className="p-3.5 rounded-full border transition-all bg-slate-900 border-slate-700 text-slate-300 shadow-xl active:scale-90"
+          className="p-4 rounded-full border transition-all bg-slate-900 border-slate-700 text-slate-300 shadow-lg active:scale-95"
         >
-          <ChevronLeft size={24} />
+          <ChevronLeft size={26} />
         </button>
-        <div className="px-5 py-2 bg-slate-900 border border-slate-800 text-slate-400 rounded-full font-black text-[10px] tracking-widest shadow-inner">
-          {currentIndex + 1} / {totalCount}
+        <div className="px-6 py-2.5 bg-slate-900/50 border border-slate-700/50 text-slate-200 rounded-2xl font-black text-sm tracking-widest shadow-inner backdrop-blur-sm min-w-[100px] text-center">
+          {currentIndex + 1} <span className="text-slate-500">/</span> {totalCount}
         </div>
         <button
           onClick={onNext}
-          className="p-3.5 rounded-full border transition-all bg-indigo-600 border-indigo-500 text-white shadow-xl shadow-indigo-600/20 active:scale-90"
+          className="p-4 rounded-full border transition-all bg-indigo-600 border-indigo-500 text-white shadow-xl shadow-indigo-600/20 active:scale-95"
         >
-          <ChevronRight size={24} />
+          <ChevronRight size={26} />
         </button>
       </div>
     </div>
