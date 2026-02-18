@@ -285,24 +285,28 @@ const App: React.FC = () => {
           <div className="flex items-center space-x-3 flex-shrink-0">
             {state.viewMode === 'card' && (
               <div className="hidden lg:flex items-center space-x-2">
-                <button
-                  onClick={() => setState(p => ({ ...p, isShuffle: !p.isShuffle, currentIndex: 0 }))}
-                  className={`p-2.5 rounded-xl border transition-all ${state.isShuffle ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-800 text-indigo-400 shadow-lg shadow-indigo-600/10 hover:bg-slate-800'}`}
-                  title="Shuffle Mode"
-                >
-                  <Shuffle size={20} />
-                </button>
-                <button
-                  onClick={() => setState(p => ({
-                    ...p,
-                    isAutoPlay: !p.isAutoPlay,
-                    autoPlayTrigger: !p.isAutoPlay ? Date.now() : p.autoPlayTrigger
-                  }))}
-                  className={`p-2.5 rounded-xl border transition-all ${state.isAutoPlay ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-800 text-indigo-400 shadow-lg shadow-indigo-600/10 hover:bg-slate-800'}`}
-                  title="Auto-Play Mode"
-                >
-                  <MonitorPlay size={20} />
-                </button>
+                {!state.isPracticeMode && (
+                  <>
+                    <button
+                      onClick={() => setState(p => ({ ...p, isShuffle: !p.isShuffle, currentIndex: 0 }))}
+                      className={`p-2.5 rounded-xl border transition-all ${state.isShuffle ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-800 text-indigo-400 shadow-lg shadow-indigo-600/10 hover:bg-slate-800'}`}
+                      title="Shuffle Mode"
+                    >
+                      <Shuffle size={20} />
+                    </button>
+                    <button
+                      onClick={() => setState(p => ({
+                        ...p,
+                        isAutoPlay: !p.isAutoPlay,
+                        autoPlayTrigger: !p.isAutoPlay ? Date.now() : p.autoPlayTrigger
+                      }))}
+                      className={`p-2.5 rounded-xl border transition-all ${state.isAutoPlay ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-800 text-indigo-400 shadow-lg shadow-indigo-600/10 hover:bg-slate-800'}`}
+                      title="Auto-Play Mode"
+                    >
+                      <MonitorPlay size={20} />
+                    </button>
+                  </>
+                )}
                 <button
                   onClick={() => setIsAssistantOpenMobile(!isAssistantOpenMobile)}
                   className={`p-2.5 rounded-xl border transition-all ${isAssistantOpenMobile ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-900 border-slate-800 text-indigo-400 shadow-lg shadow-indigo-600/10 hover:bg-slate-800'}`}
@@ -386,29 +390,33 @@ const App: React.FC = () => {
         {/* Mobile Bottom Bar for Controls */}
         {state.viewMode === 'card' && (
           <div className="lg:hidden fixed bottom-0 left-0 right-0 px-6 py-4 bg-slate-950/90 backdrop-blur-xl border-t border-slate-800 z-40 flex justify-between items-center safe-area-bottom">
-            <button
-              onClick={() => setState(p => ({ ...p, isShuffle: !p.isShuffle, currentIndex: 0 }))}
-              className={`flex flex-col items-center space-y-1.5 ${state.isShuffle ? 'text-indigo-400' : 'text-slate-400'}`}
-            >
-              <div className={`p-2.5 rounded-2xl transition-all ${state.isShuffle ? 'bg-indigo-500/20 shadow-lg shadow-indigo-500/10' : 'bg-slate-800/50'}`}>
-                <Shuffle size={22} strokeWidth={state.isShuffle ? 2.5 : 2} />
-              </div>
-              <span className="text-[11px] font-bold tracking-wide">Shuffle</span>
-            </button>
+            {!state.isPracticeMode && (
+              <>
+                <button
+                  onClick={() => setState(p => ({ ...p, isShuffle: !p.isShuffle, currentIndex: 0 }))}
+                  className={`flex flex-col items-center space-y-1.5 ${state.isShuffle ? 'text-indigo-400' : 'text-slate-400'}`}
+                >
+                  <div className={`p-2.5 rounded-2xl transition-all ${state.isShuffle ? 'bg-indigo-500/20 shadow-lg shadow-indigo-500/10' : 'bg-slate-800/50'}`}>
+                    <Shuffle size={22} strokeWidth={state.isShuffle ? 2.5 : 2} />
+                  </div>
+                  <span className="text-[11px] font-bold tracking-wide">Shuffle</span>
+                </button>
 
-            <button
-              onClick={() => setState(p => ({
-                ...p,
-                isAutoPlay: !p.isAutoPlay,
-                autoPlayTrigger: !p.isAutoPlay ? Date.now() : p.autoPlayTrigger
-              }))}
-              className={`flex flex-col items-center space-y-1.5 ${state.isAutoPlay ? 'text-indigo-400' : 'text-slate-400'}`}
-            >
-              <div className={`p-2.5 rounded-2xl transition-all ${state.isAutoPlay ? 'bg-indigo-500/20 shadow-lg shadow-indigo-500/10' : 'bg-slate-800/50'}`}>
-                <MonitorPlay size={22} strokeWidth={state.isAutoPlay ? 2.5 : 2} />
-              </div>
-              <span className="text-[11px] font-bold tracking-wide">Auto-Play</span>
-            </button>
+                <button
+                  onClick={() => setState(p => ({
+                    ...p,
+                    isAutoPlay: !p.isAutoPlay,
+                    autoPlayTrigger: !p.isAutoPlay ? Date.now() : p.autoPlayTrigger
+                  }))}
+                  className={`flex flex-col items-center space-y-1.5 ${state.isAutoPlay ? 'text-indigo-400' : 'text-slate-400'}`}
+                >
+                  <div className={`p-2.5 rounded-2xl transition-all ${state.isAutoPlay ? 'bg-indigo-500/20 shadow-lg shadow-indigo-500/10' : 'bg-slate-800/50'}`}>
+                    <MonitorPlay size={22} strokeWidth={state.isAutoPlay ? 2.5 : 2} />
+                  </div>
+                  <span className="text-[11px] font-bold tracking-wide">Auto-Play</span>
+                </button>
+              </>
+            )}
 
             <button
               onClick={() => setState(p => ({ ...p, isPracticeMode: !p.isPracticeMode }))}
