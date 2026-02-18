@@ -38,6 +38,7 @@ export interface AppState {
   autoPlayTrigger?: number;
   isFavoritesOnly?: boolean;
   bookmarks?: Set<string>; // Not in state usually if we use a separate state... wait, let's put it in state for easiest management
+  isPracticeMode?: boolean;
 }
 
 // AI Studioのグローバルプロパティを型定義

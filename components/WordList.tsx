@@ -10,9 +10,10 @@ interface WordListProps {
   lang?: string;
   bookmarks: Set<string>;
   onToggleBookmark: (id: string, e: React.MouseEvent) => void;
+  isPracticeMode?: boolean;
 }
 
-const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US', bookmarks, onToggleBookmark }) => {
+const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US', bookmarks, onToggleBookmark, isPracticeMode = false }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const { speak } = useSpeech();
 
@@ -72,10 +73,23 @@ const WordList: React.FC<WordListProps> = ({ words, onSelectWord, lang = 'en-US'
                         {w.word}
                       </button>
                     </td>
-                    <td className="px-6 py-3 hidden sm:table-cell">
-                      <p className="text-xs text-slate-400 italic font-medium truncate block w-full group-hover/row:text-slate-300 transition-colors">
-                        {w.example || '-'}
-                      </p>
+                    <td className="px-6 py-3 hidden sm:table-cell group/example">
+                      {isPracticeMode ? (
+                        <div className="relative w-full cursor-pointer group/reveal">
+                          {/* Japanese Translation (Always Visible) */}
+                          <p className="text-xs text-amber-400 font-bold mb-1 truncate">
+                            {w.exampleTranslation || 'No translation available'}
+                          </p>
+                          {/* English Original (Hidden/Blurred) - Reveal on Hover */}
+                          <p className="text-xs text-slate-300 italic font-medium truncate block w-full blur-sm group-hover/reveal:blur-0 transition-all duration-300 select-none">
+                            {w.example || '-'}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-slate-400 italic font-medium truncate block w-full group-hover/row:text-slate-300 transition-colors">
+                          {w.example || '-'}
+                        </p>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center space-x-2">

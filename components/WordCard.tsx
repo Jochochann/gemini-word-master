@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { WordItem } from '../types';
 import { Volume2, Lightbulb, ChevronRight, ChevronLeft, Quote, Star } from 'lucide-react';
 import { useSpeech } from '../hooks/useSpeech';
@@ -15,10 +15,16 @@ interface WordCardProps {
   autoPlayTrigger?: number;
   isBookmarked?: boolean;
   onToggleBookmark?: () => void;
+  isPracticeMode?: boolean;
 }
 
-const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex, totalCount, lang = 'en-US', onSpeechComplete, autoPlayTrigger, isBookmarked, onToggleBookmark }) => {
+const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex, totalCount, lang = 'en-US', onSpeechComplete, autoPlayTrigger, isBookmarked, onToggleBookmark, isPracticeMode = false }) => {
   const { speak, cancel } = useSpeech();
+  const [isRevealed, setIsRevealed] = useState(false);
+
+  useEffect(() => {
+    setIsRevealed(false);
+  }, [item.id, isPracticeMode]);
 
   const speakText = (text: string) => {
     speak(text, lang, 0.85);
@@ -124,11 +130,31 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
 
             {/* Example Box */}
             {item.example && (
-              <div className="flex items-start space-x-3 p-5 rounded-2xl bg-slate-800/30 border border-slate-800/30 hover:bg-slate-800/50 transition-colors">
+              <div className="flex items-start space-x-3 p-5 rounded-2xl bg-slate-800/30 border border-slate-800/30 hover:bg-slate-800/50 transition-colors group/example cursor-pointer min-h-[100px]">
                 <Quote className="text-slate-500 flex-shrink-0 mt-1" size={18} />
-                <div className="space-y-3">
-                  <p className="text-lg sm:text-xl text-slate-300 italic font-medium leading-relaxed font-serif">"{item.example}"</p>
-                  {item.exampleTranslation && <p className="text-slate-500 text-sm border-t border-slate-700/50 pt-2">{item.exampleTranslation}</p>}
+                <div className="space-y-3 w-full">
+                  {isPracticeMode ? (
+                    <>
+                      {/* Japanese Translation (Always Visible) */}
+                      <p className="text-xl sm:text-2xl text-amber-400/90 font-bold leading-relaxed tracking-wide">
+                        {item.exampleTranslation || 'No translation available'}
+                      </p>
+                      {/* English Original (Hidden/Blurred) - Reveal on Click/Tap */}
+                      <div
+                        className="border-t border-slate-700/50 pt-3"
+                        onClick={(e) => { e.stopPropagation(); setIsRevealed(!isRevealed); }}
+                      >
+                        <p className={`text-lg sm:text-xl text-slate-300 italic font-medium leading-relaxed font-serif transition-all duration-300 select-none ${isRevealed ? 'blur-0' : 'blur-md'}`}>
+                          "{item.example}"
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-lg sm:text-xl text-slate-300 italic font-medium leading-relaxed font-serif">"{item.example}"</p>
+                      {item.exampleTranslation && <p className="text-slate-500 text-sm border-t border-slate-700/50 pt-2">{item.exampleTranslation}</p>}
+                    </>
+                  )}
                 </div>
               </div>
             )}

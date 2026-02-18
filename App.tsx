@@ -28,7 +28,8 @@ import {
   Shuffle,
   MonitorPlay,
   Star,
-  ArrowUpToLine
+  ArrowUpToLine,
+  GraduationCap
 } from 'lucide-react';
 
 
@@ -51,7 +52,8 @@ const App: React.FC = () => {
     viewMode: 'list',
     isAutoPlay: false,
     isShuffle: false,
-    isFavoritesOnly: false
+    isFavoritesOnly: false,
+    isPracticeMode: false
   });
 
   const [bookmarks, setBookmarks] = useState<Set<string>>(new Set());
@@ -304,6 +306,15 @@ const App: React.FC = () => {
                 >
                   <Search size={20} />
                 </button>
+                <div className="w-px h-8 bg-slate-800 mx-2" />
+                <button
+                  onClick={() => setState(p => ({ ...p, isPracticeMode: !p.isPracticeMode }))}
+                  className={`flex items-center space-x-2 px-3 py-2.5 rounded-xl border transition-all ${state.isPracticeMode ? 'bg-amber-500 border-amber-400 text-white shadow-lg shadow-amber-500/20' : 'bg-slate-900 border-slate-800 text-amber-500 hover:bg-slate-800'}`}
+                  title="Practice Mode (Translation)"
+                >
+                  <GraduationCap size={20} />
+                  <span className="text-xs font-bold uppercase tracking-wider">Practice</span>
+                </button>
               </div>
             )}
 
@@ -341,6 +352,7 @@ const App: React.FC = () => {
                 autoPlayTrigger={state.autoPlayTrigger}
                 isBookmarked={bookmarks.has(currentWord.id)}
                 onToggleBookmark={() => toggleBookmark(currentWord.id)}
+                isPracticeMode={state.isPracticeMode}
               />
             ) : (
               <WordList
@@ -349,6 +361,7 @@ const App: React.FC = () => {
                 onSelectWord={(idx) => setState(p => ({ ...p, currentIndex: idx, viewMode: 'card' }))}
                 bookmarks={bookmarks}
                 onToggleBookmark={toggleBookmark}
+                isPracticeMode={state.isPracticeMode}
               />
             )}
           </div>
