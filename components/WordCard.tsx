@@ -138,17 +138,19 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
           <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4">
 
             {/* Definition / Meaning Box */}
-            <div className="bg-slate-900/50 rounded-2xl p-6 border border-slate-800/50 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-3 opacity-10">
-                <Lightbulb size={48} className="text-amber-400" />
+            {!isPracticeMode && (
+              <div className="bg-slate-900/50 rounded-2xl p-6 border border-slate-800/50 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-3 opacity-10">
+                  <Lightbulb size={48} className="text-amber-400" />
+                </div>
+                <div className="flex items-start space-x-3 relative z-10">
+                  <Lightbulb className="text-amber-400 flex-shrink-0 mt-1" size={20} />
+                  <p className="text-xl sm:text-2xl font-bold text-indigo-100 leading-relaxed tracking-wide">
+                    {item.definition || item.translation}
+                  </p>
+                </div>
               </div>
-              <div className="flex items-start space-x-3 relative z-10">
-                <Lightbulb className="text-amber-400 flex-shrink-0 mt-1" size={20} />
-                <p className="text-xl sm:text-2xl font-bold text-indigo-100 leading-relaxed tracking-wide">
-                  {item.definition || item.translation}
-                </p>
-              </div>
-            </div>
+            )}
 
             {/* Example Box */}
             {item.example && (
@@ -158,7 +160,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
                   {isPracticeMode ? (
                     <>
                       {/* Japanese Translation (Always Visible) */}
-                      <p className="text-xl sm:text-2xl text-amber-400/90 font-bold leading-relaxed tracking-wide">
+                      <p className="text-base sm:text-lg text-amber-400/90 font-bold leading-relaxed tracking-wide">
                         {item.exampleTranslation || 'No translation available'}
                       </p>
                       {/* English Original (Hidden/Blurred) - Reveal on Click/Tap */}
