@@ -83,17 +83,17 @@ const App: React.FC = () => {
     const savedId = localStorage.getItem('gemini_word_master_sheet_id') || DEFAULT_SHEET_ID;
     const savedSheetsStr = localStorage.getItem('gemini_word_master_sheets');
 
-    let targetSheets = [...DEFAULT_SHEETS];
+    let targetSheets = [];
     if (savedSheetsStr) {
       try {
         const saved = JSON.parse(savedSheetsStr);
-        // マージロジック: 保存されたデータにないGIDをDEFAULT_SHEETSから探して追加
-        const savedGids = new Set(saved.map((s: any) => s.gid));
-        const missingDefaults = DEFAULT_SHEETS.filter(d => !savedGids.has(d.gid));
-        targetSheets = [...saved, ...missingDefaults];
+        targetSheets = saved;
       } catch (e) {
         console.error("Failed to parse saved sheets", e);
       }
+    }
+    if (targetSheets.length === 0) {
+      targetSheets = [...DEFAULT_SHEETS];
     }
 
     setInputUrl(`https://docs.google.com/spreadsheets/d/${savedId}/edit`);
