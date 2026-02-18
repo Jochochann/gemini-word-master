@@ -34,7 +34,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
   }, [item.id, isPracticeMode]);
 
   useEffect(() => {
-    if (transcript && item.example) {
+    if (!isListening && transcript && item.example) {
       const score = calculateSimilarity(transcript, item.example);
       let type: 'correct' | 'close' | 'incorrect' = 'incorrect';
       if (score >= 90) type = 'correct';
@@ -46,7 +46,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
         setIsRevealed(true);
       }
     }
-  }, [transcript, item.example]);
+  }, [isListening, transcript, item.example]);
 
   const speakText = (text: string) => {
     speak(text, lang, 0.85);
