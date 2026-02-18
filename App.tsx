@@ -205,7 +205,11 @@ const App: React.FC = () => {
       <aside className={`fixed inset-y-0 left-0 z-50 bg-slate-900 border-r border-slate-800 transition-transform duration-300 flex flex-col w-72 lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 flex items-center justify-between border-b border-slate-800/50 flex-shrink-0">
           <div className="flex items-center space-x-2.5 group">
-            <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 p-2 rounded-xl text-white shadow-lg shadow-indigo-500/30 group-hover:scale-110 transition-transform"><BookOpen size={20} /></div>
+            <img
+              src="/logo.png"
+              alt="Word Master Logo"
+              className="w-10 h-10 rounded-full shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform object-cover"
+            />
             <h1 className="font-bold text-lg text-slate-100 tracking-tight">Word Master</h1>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="p-1.5 hover:bg-slate-800 rounded-lg lg:hidden text-slate-400 hover:text-white"><X size={20} /></button>
