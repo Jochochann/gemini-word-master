@@ -407,6 +407,16 @@ const App: React.FC = () => {
             </button>
 
             <button
+              onClick={() => setState(p => ({ ...p, isPracticeMode: !p.isPracticeMode }))}
+              className={`flex flex-col items-center space-y-1.5 ${state.isPracticeMode ? 'text-amber-400' : 'text-slate-400'}`}
+            >
+              <div className={`p-2.5 rounded-2xl transition-all ${state.isPracticeMode ? 'bg-amber-500/20 shadow-lg shadow-amber-500/10' : 'bg-slate-800/50'}`}>
+                <GraduationCap size={22} strokeWidth={state.isPracticeMode ? 2.5 : 2} />
+              </div>
+              <span className="text-[11px] font-bold tracking-wide">Practice</span>
+            </button>
+
+            <button
               onClick={() => setIsAssistantOpenMobile(!isAssistantOpenMobile)}
               className={`flex flex-col items-center space-y-1.5 ${isAssistantOpenMobile ? 'text-indigo-400' : 'text-slate-400'}`}
             >

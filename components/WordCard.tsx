@@ -1,8 +1,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { WordItem } from '../types';
-import { Volume2, Lightbulb, ChevronRight, ChevronLeft, Quote, Star } from 'lucide-react';
+import { Volume2, Lightbulb, ChevronRight, ChevronLeft, Quote, Star, Mic, MicOff, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 import { useSpeech } from '../hooks/useSpeech';
+import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
+import { calculateSimilarity } from '../utils/similarity';
 
 interface WordCardProps {
   item: WordItem;
@@ -21,10 +23,30 @@ interface WordCardProps {
 const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex, totalCount, lang = 'en-US', onSpeechComplete, autoPlayTrigger, isBookmarked, onToggleBookmark, isPracticeMode = false }) => {
   const { speak, cancel } = useSpeech();
   const [isRevealed, setIsRevealed] = useState(false);
+  const { isListening, transcript, startListening, stopListening, resetTranscript, hasRecognitionSupport } = useSpeechRecognition();
+  const [feedback, setFeedback] = useState<{ type: 'correct' | 'close' | 'incorrect' | null, score: number }>({ type: null, score: 0 });
 
   useEffect(() => {
     setIsRevealed(false);
+    resetTranscript();
+    stopListening();
+    setFeedback({ type: null, score: 0 });
   }, [item.id, isPracticeMode]);
+
+  useEffect(() => {
+    if (transcript && item.example) {
+      const score = calculateSimilarity(transcript, item.example);
+      let type: 'correct' | 'close' | 'incorrect' = 'incorrect';
+      if (score >= 90) type = 'correct';
+      else if (score >= 70) type = 'close';
+
+      setFeedback({ type, score });
+
+      if (score >= 90) {
+        setIsRevealed(true);
+      }
+    }
+  }, [transcript, item.example]);
 
   const speakText = (text: string) => {
     speak(text, lang, 0.85);
@@ -33,7 +55,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
   useEffect(() => {
     let timeoutId: number | undefined;
 
-    if (item.word) {
+    if (item.word && !isPracticeMode) {
       speak(item.word, lang, 0.85, () => {
         if (item.example && lang !== 'zh-TW') {
           timeoutId = window.setTimeout(() => {
@@ -148,6 +170,31 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
                           "{item.example}"
                         </p>
                       </div>
+
+                      {/* Voice Input Controls */}
+                      {hasRecognitionSupport && (
+                        <div className="mt-4 pt-4 border-t border-slate-700/50 flex flex-col items-center space-y-3" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={isListening ? stopListening : startListening}
+                            className={`p-4 rounded-full transition-all flex items-center justify-center shadow-lg ${isListening ? 'bg-rose-500 text-white animate-pulse shadow-rose-500/30' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+                          >
+                            {isListening ? <MicOff size={24} /> : <Mic size={24} />}
+                          </button>
+
+                          {isListening && <p className="text-xs text-rose-400 font-bold uppercase tracking-wider animate-pulse">Listening...</p>}
+
+                          {transcript && (
+                            <div className="w-full bg-slate-900/80 p-3 rounded-xl border border-slate-700/50">
+                              <p className="text-sm text-slate-300 font-mono text-center break-words mb-2">
+                                "{transcript}"
+                              </p>
+                              <div className="flex justify-end items-center border-t border-white/10 pt-2">
+                                <span className="text-xs font-bold">{feedback.score}% Match</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </>
                   ) : (
                     <>
