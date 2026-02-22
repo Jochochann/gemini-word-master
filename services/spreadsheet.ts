@@ -36,7 +36,9 @@ export const fetchSpreadsheetWords = async (id: string, gid: string): Promise<Wo
             definition: parts[2] || '', // Fallback for UI
             example: parts[3] || '',
             exampleTranslation: parts[5] || '', // Column F is index 5
-            notes: parts[4] || ''
+            notes: parts[4] || '',
+            _hidden: parts[6]?.toUpperCase() === 'TRUE' // Column G is index 6
         };
-    }).filter(w => w.word !== '');
+    }).filter(w => w.word !== '' && !w._hidden)
+      .map(({ _hidden, ...rest }) => rest) as WordItem[];
 };
