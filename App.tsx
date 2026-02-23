@@ -32,17 +32,9 @@ import {
   GraduationCap
 } from 'lucide-react';
 
-
-
-
-
-
-
-
 const App: React.FC = () => {
   const queryClient = useQueryClient();
   const [state, setState] = useState<AppState>({
-    words: [],
     currentIndex: 0,
     isLoading: true,
     spreadsheetId: '',
@@ -184,8 +176,7 @@ const App: React.FC = () => {
     }
 
     if (!state.isShuffle) return words;
-    // Shuffle logic
-    return [...fetchedWords].sort(() => Math.random() - 0.5);
+    return [...words].sort(() => Math.random() - 0.5);
   }, [fetchedWords, state.isShuffle, state.isFavoritesOnly, bookmarks]);
 
   const currentWord = displayWords[state.currentIndex];

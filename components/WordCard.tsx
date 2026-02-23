@@ -146,7 +146,7 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
                 <div className="flex items-start space-x-3 relative z-10">
                   <Lightbulb className="text-amber-400 flex-shrink-0 mt-1" size={20} />
                   <p className="text-xl sm:text-2xl font-bold text-indigo-100 leading-relaxed tracking-wide">
-                    {item.definition || item.translation}
+                    {item.translation}
                   </p>
                 </div>
               </div>

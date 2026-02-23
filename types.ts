@@ -3,7 +3,6 @@ export interface WordItem {
   id: string;
   word: string;
   translation: string;
-  definition?: string;
   partOfSpeech?: string;
   pronunciation?: string;
   example?: string;
@@ -25,7 +24,6 @@ export interface SheetConfig {
 }
 
 export interface AppState {
-  words: WordItem[];
   currentIndex: number;
   isLoading: boolean;
   spreadsheetId: string;
@@ -37,14 +35,11 @@ export interface AppState {
   isShuffle?: boolean;
   autoPlayTrigger?: number;
   isFavoritesOnly?: boolean;
-  bookmarks?: Set<string>; // Not in state usually if we use a separate state... wait, let's put it in state for easiest management
   isPracticeMode?: boolean;
 }
 
 // AI Studioのグローバルプロパティを型定義
 declare global {
-  // Fix: Move the AIStudio interface inside declare global to prevent namespace conflicts 
-  // between exported module types and global types, which causes "type is AIStudio but must be AIStudio" errors.
   interface AIStudio {
     hasSelectedApiKey: () => Promise<boolean>;
     openSelectKey: () => Promise<void>;
