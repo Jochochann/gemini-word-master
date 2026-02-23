@@ -146,6 +146,14 @@ const App: React.FC = () => {
 
   const handleClearCache = async () => {
     setIsRefreshing(true);
+    // シート設定をDEFAULT_SHEETSにリセット
+    localStorage.removeItem('gemini_word_master_sheets');
+    setState(prev => ({
+      ...prev,
+      sheets: [...DEFAULT_SHEETS],
+      currentSheetGid: DEFAULT_SHEETS[0]?.gid || '0',
+      currentIndex: 0,
+    }));
     queryClient.removeQueries({ queryKey: ['spreadsheet-words'] });
     await refetch();
     setTimeout(() => setIsRefreshing(false), 800);
