@@ -6,8 +6,15 @@ export const DEFAULT_SHEETS: SheetConfig[] = [
     { name: 'GoFluent', gid: '0', lang: 'en-US' },
     { name: 'Atsueigo', gid: '420352437', lang: 'en-US' },
     { name: 'Atsu構文', gid: '1185143192', lang: 'en-US' },
-    { name: 'Grammer', gid: '14369093', lang: 'en-US' },
-    { name: '台湾旅行', gid: '1574869365', lang: 'zh-TW' }
+    { name: '台湾旅行', gid: '1574869365', lang: 'zh-TW' },
+    { name: '準備級一級', gid: '1241092806', lang: 'zh-TW' },
+    { name: '準備級二級', gid: '2028056660', lang: 'zh-TW' },
+    { name: '入門級', gid: '893410915', lang: 'zh-TW' },
+    { name: '基礎級', gid: '41161972', lang: 'zh-TW' },
+    { name: '進階級', gid: '375418572', lang: 'zh-TW' },
+    { name: '高階級', gid: '1954949646', lang: 'zh-TW' },
+    { name: '流利級', gid: '1273380145', lang: 'zh-TW' },
+    { name: '語法點表', gid: '1387028708', lang: 'zh-TW' }
 ];
 
 export const extractId = (url: string) => {
@@ -40,5 +47,5 @@ export const fetchSpreadsheetWords = async (id: string, gid: string): Promise<Wo
             _hidden: parts[6]?.toUpperCase() === 'TRUE' // Column G is index 6
         };
     }).filter(w => w.word !== '' && !w._hidden)
-      .map(({ _hidden, ...rest }) => rest) as WordItem[];
+        .map(({ _hidden, ...rest }) => rest) as WordItem[];
 };
