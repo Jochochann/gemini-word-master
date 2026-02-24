@@ -14,7 +14,7 @@ export const DEFAULT_SHEETS: SheetConfig[] = [
     { name: '進階級', gid: '375418572', lang: 'zh-TW' },
     { name: '高階級', gid: '1954949646', lang: 'zh-TW' },
     { name: '流利級', gid: '1273380145', lang: 'zh-TW' },
-    { name: '語法點表', gid: '1387028708', lang: 'zh-TW' }
+    { name: '語法點表', gid: '1856746060', lang: 'zh-TW' }
 ];
 
 export const extractId = (url: string) => {
