@@ -79,7 +79,7 @@ const App: React.FC = () => {
   );
 
   const { data: fetchedEssays, isLoading: isEssayLoading } = useQuery<EssayItem[]>({
-    queryKey: ['essay-data-v2', state.spreadsheetId, currentEssayGid],
+    queryKey: ['essay-data-v3', state.spreadsheetId, currentEssayGid],
     queryFn: () => fetchEssays(state.spreadsheetId, currentEssayGid),
     enabled: !!state.spreadsheetId && !!currentEssayGid && state.viewMode === 'essay',
     gcTime: 0,

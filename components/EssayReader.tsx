@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { EssayItem } from '../types';
-import { ChevronLeft, ChevronRight, Volume2, BookOpen, Languages, Play, Square } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BookOpen, Languages, Play, Square, List } from 'lucide-react';
 import { useSpeech } from '../hooks/useSpeech';
 
 interface EssayReaderProps {
@@ -87,8 +87,8 @@ const EssayReader: React.FC<EssayReaderProps> = ({ essays }) => {
                     <button
                         onClick={handleSpeak}
                         className={`p-2 rounded-xl transition-all active:scale-95 shadow-lg ${isPlaying
-                                ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-600/20'
-                                : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20'
+                            ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-600/20'
+                            : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20'
                             }`}
                         title={isPlaying ? '停止' : '読み上げ'}
                     >
@@ -143,6 +143,43 @@ const EssayReader: React.FC<EssayReaderProps> = ({ essays }) => {
                                 style={{ whiteSpace: 'pre-wrap' }}>
                                 {essay.translation}
                             </p>
+                        </div>
+                    </section>
+                )}
+
+                {/* ④ Vocabulary List */}
+                {essay.vocabulary.length > 0 && (
+                    <section>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center space-x-1.5">
+                            <List size={11} />
+                            <span>{isZhTW ? '④' : '③'} 単語一覧</span>
+                            <span className="ml-1 px-2 py-0.5 bg-slate-800 rounded-full text-slate-500 font-bold text-[9px]">
+                                {essay.vocabulary.length}
+                            </span>
+                        </label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {essay.vocabulary.map((v, i) => (
+                                <div
+                                    key={i}
+                                    className="flex items-center justify-between px-4 py-3 bg-slate-900 rounded-xl border border-slate-800 hover:border-slate-700 transition-colors group"
+                                >
+                                    <div className="flex flex-col">
+                                        <span className={`font-bold text-white group-hover:text-indigo-300 transition-colors ${isZhTW ? 'text-base tracking-wide' : 'text-sm'}`}>
+                                            {v.word}
+                                        </span>
+                                        {v.pinyin && (
+                                            <span className="text-[11px] text-slate-500 font-mono mt-0.5">
+                                                {v.pinyin}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {v.meaning && (
+                                        <span className="text-xs text-slate-400 ml-3 text-right leading-snug max-w-[55%]">
+                                            {v.meaning}
+                                        </span>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     </section>
                 )}

@@ -1,4 +1,4 @@
-import { WordItem, SheetConfig, EssayItem } from '../types';
+import { WordItem, SheetConfig, EssayItem, EssayVocabItem } from '../types';
 import {
     DEFAULT_SHEET_ID,
     DEFAULT_SHEETS,
@@ -97,13 +97,36 @@ export const fetchEssays = async (id: string, gid: string): Promise<EssayItem[]>
             const title = getVal(0);
             if (!title) return null;
 
+            // E列: JSON形式の単語リストをパース
+            // 期待形式: [{"word":"...","pinyin":"...","meaning":"..."}, ...]
+            // gvizは " を \u0022 として二重エスケープして返すため、パース前に正規化が必要
+            let vocabulary: EssayVocabItem[] = [];
+            const vocabRaw = getVal(4);
+            if (vocabRaw) {
+                try {
+                    const parsed = JSON.parse(vocabRaw);
+                    if (Array.isArray(parsed)) {
+                        vocabulary = parsed
+                            .filter((v): v is Record<string, string> => v && typeof v.word === 'string')
+                            .map(v => ({
+                                word: v.word.trim(),
+                                pinyin: v.pinyin?.trim() || undefined,
+                                meaning: (v.meaning ?? '').trim(),
+                            }));
+                    }
+                } catch (e) {
+                    console.warn('[essay] vocab parse failed:', e);
+                }
+            }
+
             return {
                 id: (idx + 1).toString(),
                 title,
                 essay: getVal(1),
                 pinyin: getVal(2) || undefined,
                 translation: getVal(3),
-                lang: getVal(4) || 'zh-TW',
+                vocabulary,
+                lang: getVal(5) || 'zh-TW',  // F列
             } as EssayItem;
         })
         .filter(Boolean) as EssayItem[];

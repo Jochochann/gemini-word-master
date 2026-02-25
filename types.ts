@@ -10,12 +10,19 @@ export interface WordItem {
   notes?: string;
 }
 
+export interface EssayVocabItem {
+  word: string;
+  pinyin?: string;
+  meaning: string;
+}
+
 export interface EssayItem {
   id: string;
   title: string;
   essay: string;
   pinyin?: string;
   translation: string;
+  vocabulary: EssayVocabItem[];
   lang: string;
 }
 
