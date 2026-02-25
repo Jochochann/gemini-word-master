@@ -4,8 +4,10 @@ import { AppState, WordItem, ViewMode, SheetConfig } from './types.ts';
 import WordCard from './components/WordCard.tsx';
 import WordList from './components/WordList.tsx';
 import WordAssistant from './components/WordAssistant.tsx';
+import EssayReader from './components/EssayReader.tsx';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { fetchSpreadsheetWords, extractId, DEFAULT_SHEETS, DEFAULT_SHEET_ID } from './services/spreadsheet';
+import { fetchSpreadsheetWords, extractId, DEFAULT_SHEETS, DEFAULT_SHEET_ID, fetchEssays, DEFAULT_ESSAY_SHEETS } from './services/spreadsheet';
+import { EssayItem } from './types.ts';
 import LanguageSelector from './components/LanguageSelector';
 import {
   Settings,
@@ -29,7 +31,8 @@ import {
   MonitorPlay,
   Star,
   ArrowUpToLine,
-  GraduationCap
+  GraduationCap,
+  BookText
 } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -62,8 +65,27 @@ const App: React.FC = () => {
   const { data: fetchedWords, isLoading: isQueryLoading, error: queryError, refetch, isRefetching } = useQuery<WordItem[]>({
     queryKey: ['spreadsheet-words', state.spreadsheetId, state.currentSheetGid],
     queryFn: () => fetchSpreadsheetWords(state.spreadsheetId, state.currentSheetGid),
-    enabled: !!state.spreadsheetId,
+    enabled: !!state.spreadsheetId && state.viewMode !== 'essay',
   });
+
+  // Essay用の別シート設定（DEFAULT_ESSAY_SHEETSから動的に参照）
+  const essaySheets = useMemo(() => [...DEFAULT_ESSAY_SHEETS], []);
+  const [essayLang, setEssayLang] = useState<'zh-TW' | 'en-US'>(
+    essaySheets.some(s => s.lang === 'zh-TW') ? 'zh-TW' : 'en-US'
+  );
+  const currentEssayGid = useMemo(
+    () => essaySheets.find(s => s.lang === essayLang)?.gid || essaySheets[0]?.gid || '',
+    [essaySheets, essayLang]
+  );
+
+  const { data: fetchedEssays, isLoading: isEssayLoading } = useQuery<EssayItem[]>({
+    queryKey: ['essay-data-v2', state.spreadsheetId, currentEssayGid],
+    queryFn: () => fetchEssays(state.spreadsheetId, currentEssayGid),
+    enabled: !!state.spreadsheetId && !!currentEssayGid && state.viewMode === 'essay',
+    gcTime: 0,
+  });
+
+  const essays = fetchedEssays || [];
 
   const currentSheet = useMemo(() => {
     return state.sheets.find((s: SheetConfig) => s.gid === state.currentSheetGid) || state.sheets[0];
@@ -217,6 +239,7 @@ const App: React.FC = () => {
           <nav className="space-y-1.5">
             <button onClick={() => setState(p => ({ ...p, viewMode: 'card', isFavoritesOnly: false }))} className={`w-full text-left px-4 py-3.5 rounded-xl transition-all flex items-center space-x-3 mb-2 ${state.viewMode === 'card' && !state.isFavoritesOnly ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}><Play size={18} className={state.viewMode === 'card' && !state.isFavoritesOnly ? 'text-white' : 'text-indigo-400'} /><span className="font-bold text-sm">カード学習</span></button>
             <button onClick={() => setState(p => ({ ...p, viewMode: 'list', isFavoritesOnly: false }))} className={`w-full text-left px-4 py-3.5 rounded-xl transition-all flex items-center space-x-3 mb-2 ${state.viewMode === 'list' && !state.isFavoritesOnly ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}><LayoutGrid size={18} className={state.viewMode === 'list' && !state.isFavoritesOnly ? 'text-white' : 'text-indigo-400'} /><span className="font-bold text-sm">単語一覧</span></button>
+            <button onClick={() => setState(p => ({ ...p, viewMode: 'essay', isFavoritesOnly: false }))} className={`w-full text-left px-4 py-3.5 rounded-xl transition-all flex items-center space-x-3 mb-2 ${state.viewMode === 'essay' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}><BookText size={18} className={state.viewMode === 'essay' ? 'text-white' : 'text-emerald-400'} /><span className="font-bold text-sm">エッセイ</span></button>
             <button onClick={() => setState(p => ({ ...p, viewMode: 'card', isFavoritesOnly: true, currentIndex: 0 }))} className={`w-full text-left px-4 py-3.5 rounded-xl transition-all flex items-center space-x-3 mb-2 ${state.isFavoritesOnly ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}><Star size={18} className={state.isFavoritesOnly ? 'text-white' : 'text-amber-500'} /><span className="font-bold text-sm">苦手・保存済み</span></button>
             <div className="h-px bg-slate-800 w-full mb-4" />
             <div className="px-3 py-2.5 mb-2 flex items-center justify-between sticky top-0 bg-slate-900/95 backdrop-blur z-10 -mx-2 rounded-xl">
@@ -257,28 +280,59 @@ const App: React.FC = () => {
         <header className="h-20 flex items-center justify-between px-4 sm:px-6 border-b border-slate-800 bg-slate-950/50 backdrop-blur-md sticky top-0 z-30">
           <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
             <button onClick={() => setIsSidebarOpen(true)} className="p-2 text-slate-300 lg:hidden flex-shrink-0 hover:bg-slate-800 rounded-lg"><Menu size={20} /></button>
-            <LanguageSelector
-              label="EN"
-              sheets={englishSheets}
-              type="en"
-              active={currentSheet?.lang === 'en-US'}
-              currentSheetName={currentSheet?.name}
-              onSelectSheet={(gid) => setState(p => ({ ...p, currentSheetGid: gid, currentIndex: 0 }))}
-              openDropdown={openDropdown}
-              setOpenDropdown={setOpenDropdown}
-              currentSheetGid={state.currentSheetGid}
-            />
-            <LanguageSelector
-              label="TW"
-              sheets={taiwaneseSheets}
-              type="tw"
-              active={currentSheet?.lang === 'zh-TW'}
-              currentSheetName={currentSheet?.name}
-              onSelectSheet={(gid) => setState(p => ({ ...p, currentSheetGid: gid, currentIndex: 0 }))}
-              openDropdown={openDropdown}
-              setOpenDropdown={setOpenDropdown}
-              currentSheetGid={state.currentSheetGid}
-            />
+            {state.viewMode !== 'essay' && (
+              <>
+                <LanguageSelector
+                  label="EN"
+                  sheets={englishSheets}
+                  type="en"
+                  active={currentSheet?.lang === 'en-US'}
+                  currentSheetName={currentSheet?.name}
+                  onSelectSheet={(gid) => setState(p => ({ ...p, currentSheetGid: gid, currentIndex: 0 }))}
+                  openDropdown={openDropdown}
+                  setOpenDropdown={setOpenDropdown}
+                  currentSheetGid={state.currentSheetGid}
+                />
+                <LanguageSelector
+                  label="TW"
+                  sheets={taiwaneseSheets}
+                  type="tw"
+                  active={currentSheet?.lang === 'zh-TW'}
+                  currentSheetName={currentSheet?.name}
+                  onSelectSheet={(gid) => setState(p => ({ ...p, currentSheetGid: gid, currentIndex: 0 }))}
+                  openDropdown={openDropdown}
+                  setOpenDropdown={setOpenDropdown}
+                  currentSheetGid={state.currentSheetGid}
+                />
+              </>
+            )}
+            {/* エッセイモード: 言語トグル */}
+            {state.viewMode === 'essay' && (
+              <div className="flex items-center space-x-2">
+                {essaySheets.some(s => s.lang === 'en-US') && (
+                  <button
+                    onClick={() => setEssayLang('en-US')}
+                    className={`px-4 py-1.5 rounded-xl font-black text-sm border transition-all ${essayLang === 'en-US'
+                      ? 'bg-indigo-600/20 border-indigo-500/30 text-indigo-300'
+                      : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+                      }`}
+                  >
+                    EN
+                  </button>
+                )}
+                {essaySheets.some(s => s.lang === 'zh-TW') && (
+                  <button
+                    onClick={() => setEssayLang('zh-TW')}
+                    className={`px-4 py-1.5 rounded-xl font-black text-sm border transition-all ${essayLang === 'zh-TW'
+                      ? 'bg-indigo-600/20 border-indigo-500/30 text-indigo-300'
+                      : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+                      }`}
+                  >
+                    繁中
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex items-center space-x-3 flex-shrink-0">
@@ -328,14 +382,24 @@ const App: React.FC = () => {
             <div className="hidden sm:flex bg-slate-900 p-1 rounded-xl border border-slate-800">
               <button onClick={() => setState(p => ({ ...p, viewMode: 'card' }))} className={`px-4 py-1.5 rounded-lg text-[11px] font-bold ${state.viewMode === 'card' ? 'bg-slate-800 text-indigo-400' : 'text-slate-500 hover:text-slate-400'}`}>CARD</button>
               <button onClick={() => setState(p => ({ ...p, viewMode: 'list' }))} className={`px-4 py-1.5 rounded-lg text-[11px] font-bold ${state.viewMode === 'list' ? 'bg-slate-800 text-indigo-400' : 'text-slate-500 hover:text-slate-400'}`}>LIST</button>
+              <button onClick={() => setState(p => ({ ...p, viewMode: 'essay' }))} className={`px-4 py-1.5 rounded-lg text-[11px] font-bold ${state.viewMode === 'essay' ? 'bg-slate-800 text-emerald-400' : 'text-slate-500 hover:text-slate-400'}`}>ESSAY</button>
               {state.isFavoritesOnly && <div className="ml-2 px-2 flex items-center text-[10px] font-bold text-amber-500 bg-amber-500/10 rounded-lg">FILTER ACTIVE</div>}
             </div>
           </div>
         </header>
 
         <div className="flex-1 flex flex-col lg:flex-row min-h-0 relative">
-          <div className={`flex-1 ${state.viewMode === 'list' ? 'flex flex-col overflow-hidden' : 'overflow-y-auto pt-8 pb-40 lg:pb-32 custom-scrollbar'}`}>
-            {(isQueryLoading && displayWords.length === 0) ? (
+          <div className={`flex-1 ${state.viewMode === 'list' ? 'flex flex-col overflow-hidden' : state.viewMode === 'essay' ? 'flex flex-col overflow-hidden' : 'overflow-y-auto pt-8 pb-40 lg:pb-32 custom-scrollbar'}`}>
+            {state.viewMode === 'essay' ? (
+              isEssayLoading ? (
+                <div className="flex flex-col items-center py-20 animate-pulse">
+                  <Loader2 className="text-emerald-500 animate-spin mb-6" size={48} />
+                  <p className="text-slate-500 text-sm tracking-widest uppercase">Loading Essays...</p>
+                </div>
+              ) : (
+                <EssayReader essays={essays} />
+              )
+            ) : (isQueryLoading && displayWords.length === 0) ? (
               <div className="flex flex-col items-center py-20 animate-pulse">
                 <Loader2 className="text-indigo-500 animate-spin mb-6" size={48} />
                 <p className="text-slate-500 text-sm tracking-widest uppercase">Fetching Words...</p>
@@ -373,17 +437,19 @@ const App: React.FC = () => {
             )}
           </div>
 
-          <div className={`fixed inset-0 z-50 lg:relative lg:inset-auto lg:z-0 lg:w-96 bg-slate-900 border-l border-slate-800 transition-transform duration-300 ${isAssistantOpenMobile ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'} lg:block ${state.viewMode === 'card' ? 'block' : 'hidden'}`}>
-            {isAssistantOpenMobile && (
-              <button
-                onClick={() => setIsAssistantOpenMobile(false)}
-                className="absolute top-4 right-4 z-[60] p-2 bg-slate-800 text-slate-400 rounded-full lg:hidden"
-              >
-                <X size={20} />
-              </button>
-            )}
-            {currentWord && <WordAssistant key={currentWord.id + currentWord.word} currentWord={currentWord} lang={currentSheet?.lang} />}
-          </div>
+          {state.viewMode === 'card' && (
+            <div className={`fixed inset-0 z-50 lg:relative lg:inset-auto lg:z-0 lg:w-96 bg-slate-900 border-l border-slate-800 transition-transform duration-300 ${isAssistantOpenMobile ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'} lg:block`}>
+              {isAssistantOpenMobile && (
+                <button
+                  onClick={() => setIsAssistantOpenMobile(false)}
+                  className="absolute top-4 right-4 z-[60] p-2 bg-slate-800 text-slate-400 rounded-full lg:hidden"
+                >
+                  <X size={20} />
+                </button>
+              )}
+              {currentWord && <WordAssistant key={currentWord.id + currentWord.word} currentWord={currentWord} lang={currentSheet?.lang} />}
+            </div>
+          )}
         </div>
 
         {/* Mobile Bottom Bar for Controls */}

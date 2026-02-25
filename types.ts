@@ -10,12 +10,21 @@ export interface WordItem {
   notes?: string;
 }
 
+export interface EssayItem {
+  id: string;
+  title: string;
+  essay: string;
+  pinyin?: string;
+  translation: string;
+  lang: string;
+}
+
 export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
 }
 
-export type ViewMode = 'card' | 'list';
+export type ViewMode = 'card' | 'list' | 'essay';
 
 export interface SheetConfig {
   name: string;
