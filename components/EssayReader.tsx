@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { EssayItem } from '../types';
-import { ChevronLeft, ChevronRight, Volume2, BookOpen, Languages } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Volume2, BookOpen, Languages, Play, Square } from 'lucide-react';
 import { useSpeech } from '../hooks/useSpeech';
 
 interface EssayReaderProps {
@@ -11,7 +11,8 @@ const EssayReader: React.FC<EssayReaderProps> = ({ essays }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [showTranslation, setShowTranslation] = useState(true);
     const [showPinyin, setShowPinyin] = useState(true);
-    const { speak } = useSpeech();
+    const [isPlaying, setIsPlaying] = useState(false);
+    const { speak, cancel } = useSpeech();
 
     if (essays.length === 0) {
         return (
@@ -30,11 +31,25 @@ const EssayReader: React.FC<EssayReaderProps> = ({ essays }) => {
     const essay = essays[currentIndex];
     const isZhTW = essay.lang === 'zh-TW';
 
-    const handlePrev = () => setCurrentIndex(i => (i - 1 + essays.length) % essays.length);
-    const handleNext = () => setCurrentIndex(i => (i + 1) % essays.length);
+    const handlePrev = () => {
+        cancel();
+        setIsPlaying(false);
+        setCurrentIndex(i => (i - 1 + essays.length) % essays.length);
+    };
+    const handleNext = () => {
+        cancel();
+        setIsPlaying(false);
+        setCurrentIndex(i => (i + 1) % essays.length);
+    };
 
     const handleSpeak = () => {
-        speak(essay.essay, essay.lang, 0.85);
+        if (isPlaying) {
+            cancel();
+            setIsPlaying(false);
+        } else {
+            speak(essay.essay, essay.lang, 0.85, () => setIsPlaying(false));
+            setIsPlaying(true);
+        }
     };
 
     return (
@@ -68,13 +83,18 @@ const EssayReader: React.FC<EssayReaderProps> = ({ essays }) => {
                     >
                         <Languages size={12} className="inline mr-1" />訳
                     </button>
-                    {/* Speak button */}
+                    {/* Play / Stop button */}
                     <button
                         onClick={handleSpeak}
-                        className="p-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-all active:scale-95 shadow-lg shadow-indigo-600/20"
-                        title="読み上げ"
+                        className={`p-2 rounded-xl transition-all active:scale-95 shadow-lg ${isPlaying
+                                ? 'bg-red-600 hover:bg-red-500 text-white shadow-red-600/20'
+                                : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/20'
+                            }`}
+                        title={isPlaying ? '停止' : '読み上げ'}
                     >
-                        <Volume2 size={16} strokeWidth={2.5} />
+                        {isPlaying
+                            ? <Square size={16} strokeWidth={2.5} fill="currentColor" />
+                            : <Play size={16} strokeWidth={2.5} fill="currentColor" />}
                     </button>
                 </div>
             </div>
