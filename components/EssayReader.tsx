@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { EssayItem } from '../types';
-import { ChevronLeft, ChevronRight, BookOpen, Languages, Play, Square, List } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BookOpen, Languages, Play, Square, List, Volume2 } from 'lucide-react';
 import { useSpeech } from '../hooks/useSpeech';
 
 interface EssayReaderProps {
@@ -12,6 +12,7 @@ const EssayReader: React.FC<EssayReaderProps> = ({ essays }) => {
     const [showTranslation, setShowTranslation] = useState(true);
     const [showPinyin, setShowPinyin] = useState(true);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [playingVocabIndex, setPlayingVocabIndex] = useState<number | null>(null);
     const { speak, cancel } = useSpeech();
 
     if (essays.length === 0) {
@@ -34,11 +35,13 @@ const EssayReader: React.FC<EssayReaderProps> = ({ essays }) => {
     const handlePrev = () => {
         cancel();
         setIsPlaying(false);
+        setPlayingVocabIndex(null);
         setCurrentIndex(i => (i - 1 + essays.length) % essays.length);
     };
     const handleNext = () => {
         cancel();
         setIsPlaying(false);
+        setPlayingVocabIndex(null);
         setCurrentIndex(i => (i + 1) % essays.length);
     };
 
@@ -47,8 +50,21 @@ const EssayReader: React.FC<EssayReaderProps> = ({ essays }) => {
             cancel();
             setIsPlaying(false);
         } else {
+            setPlayingVocabIndex(null);
             speak(essay.essay, essay.lang, 0.85, () => setIsPlaying(false));
             setIsPlaying(true);
+        }
+    };
+
+    const handleVocabSpeak = (word: string, idx: number) => {
+        if (playingVocabIndex === idx) {
+            cancel();
+            setPlayingVocabIndex(null);
+        } else {
+            cancel();
+            setIsPlaying(false);
+            setPlayingVocabIndex(idx);
+            speak(word, essay.lang, 0.85, () => setPlayingVocabIndex(null));
         }
     };
 
@@ -158,28 +174,49 @@ const EssayReader: React.FC<EssayReaderProps> = ({ essays }) => {
                             </span>
                         </label>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {essay.vocabulary.map((v, i) => (
-                                <div
-                                    key={i}
-                                    className="flex items-center justify-between px-4 py-3 bg-slate-900 rounded-xl border border-slate-800 hover:border-slate-700 transition-colors group"
-                                >
-                                    <div className="flex flex-col">
-                                        <span className={`font-bold text-white group-hover:text-indigo-300 transition-colors ${isZhTW ? 'text-base tracking-wide' : 'text-sm'}`}>
-                                            {v.word}
-                                        </span>
-                                        {v.pinyin && (
-                                            <span className="text-[11px] text-slate-500 font-mono mt-0.5">
-                                                {v.pinyin}
+                            {essay.vocabulary.map((v, i) => {
+                                const isVocabPlaying = playingVocabIndex === i;
+                                return (
+                                    <div
+                                        key={i}
+                                        className={`flex items-center justify-between px-4 py-3 rounded-xl border transition-colors group ${isVocabPlaying
+                                            ? 'bg-indigo-600/10 border-indigo-500/40'
+                                            : 'bg-slate-900 border-slate-800 hover:border-slate-700'
+                                            }`}
+                                    >
+                                        <div className="flex flex-col min-w-0">
+                                            <span className={`font-bold transition-colors ${isZhTW ? 'text-base tracking-wide' : 'text-sm'} ${isVocabPlaying ? 'text-indigo-300' : 'text-white group-hover:text-indigo-300'
+                                                }`}>
+                                                {v.word}
                                             </span>
-                                        )}
+                                            {v.pinyin && (
+                                                <span className="text-[11px] text-slate-500 font-mono mt-0.5">
+                                                    {v.pinyin}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-2 ml-2 flex-shrink-0">
+                                            {v.meaning && (
+                                                <span className="text-xs text-slate-400 text-right leading-snug max-w-[120px]">
+                                                    {v.meaning}
+                                                </span>
+                                            )}
+                                            <button
+                                                onClick={() => handleVocabSpeak(v.word, i)}
+                                                className={`p-1.5 rounded-lg transition-all active:scale-90 flex-shrink-0 ${isVocabPlaying
+                                                    ? 'bg-indigo-600 text-white'
+                                                    : 'bg-slate-800 text-slate-500 hover:text-indigo-400 hover:bg-slate-700 opacity-0 group-hover:opacity-100'
+                                                    }`}
+                                                title={isVocabPlaying ? '停止' : '読み上げ'}
+                                            >
+                                                {isVocabPlaying
+                                                    ? <Square size={11} strokeWidth={2.5} fill="currentColor" />
+                                                    : <Volume2 size={11} strokeWidth={2.5} />}
+                                            </button>
+                                        </div>
                                     </div>
-                                    {v.meaning && (
-                                        <span className="text-xs text-slate-400 ml-3 text-right leading-snug max-w-[55%]">
-                                            {v.meaning}
-                                        </span>
-                                    )}
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </section>
                 )}
