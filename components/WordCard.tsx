@@ -222,26 +222,13 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
           </div>
         </div>
 
-        {/* Desktop Navigation */}
-        <button
-          onClick={(e) => { e.stopPropagation(); onPrev(); }}
-          className="hidden sm:flex absolute -left-12 lg:-left-20 top-1/2 -translate-y-1/2 p-4 rounded-full transition-all bg-slate-900 border border-slate-800 shadow-2xl text-slate-300 hover:text-indigo-400 hover:scale-110 active:scale-95"
-        >
-          <ChevronLeft size={36} />
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); onNext(); }}
-          className="hidden sm:flex absolute -right-12 lg:-right-20 top-1/2 -translate-y-1/2 p-4 rounded-full transition-all bg-slate-900 border border-slate-800 shadow-2xl text-slate-300 hover:text-indigo-400 hover:scale-110 active:scale-95"
-        >
-          <ChevronRight size={36} />
-        </button>
       </div>
 
-      {/* Mobile Navigation */}
-      <div className="mt-8 flex sm:hidden justify-center items-center space-x-6 pb-4">
+      {/* Navigation Bar (all screen sizes) */}
+      <div className="mt-6 flex justify-center items-center space-x-6 pb-4">
         <button
-          onClick={onPrev}
-          className="p-4 rounded-full border transition-all bg-slate-900 border-slate-700 text-slate-300 shadow-lg active:scale-95"
+          onClick={(e) => { e.stopPropagation(); onPrev(); }}
+          className="p-4 rounded-full border transition-all bg-slate-900 border-slate-700 text-slate-300 shadow-lg hover:text-indigo-400 hover:border-indigo-500/50 active:scale-95"
         >
           <ChevronLeft size={26} />
         </button>
@@ -249,8 +236,8 @@ const WordCard: React.FC<WordCardProps> = ({ item, onNext, onPrev, currentIndex,
           {currentIndex + 1} <span className="text-slate-500">/</span> {totalCount}
         </div>
         <button
-          onClick={onNext}
-          className="p-4 rounded-full border transition-all bg-indigo-600 border-indigo-500 text-white shadow-xl shadow-indigo-600/20 active:scale-95"
+          onClick={(e) => { e.stopPropagation(); onNext(); }}
+          className="p-4 rounded-full border transition-all bg-indigo-600 border-indigo-500 text-white shadow-xl shadow-indigo-600/20 hover:bg-indigo-500 active:scale-95"
         >
           <ChevronRight size={26} />
         </button>
