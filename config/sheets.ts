@@ -19,14 +19,16 @@ export const DEFAULT_SHEETS: SheetConfig[] = [
 
     // ── 台湾華語 ─────────────────────────────────────────
     { name: '台湾旅行', gid: '1574869365', lang: 'zh-TW' },
-    { name: '準備級一級', gid: '1241092806', lang: 'zh-TW' },
-    { name: '準備級二級', gid: '2028056660', lang: 'zh-TW' },
-    { name: '入門級', gid: '893410915', lang: 'zh-TW' },
-    { name: '基礎級', gid: '41161972', lang: 'zh-TW' },
-    { name: '進階級', gid: '375418572', lang: 'zh-TW' },
-    { name: '高階級', gid: '1954949646', lang: 'zh-TW' },
-    { name: '流利級', gid: '1273380145', lang: 'zh-TW' },
-    { name: '語法點表', gid: '1856746060', lang: 'zh-TW' },
+    { name: '台湾Menu', gid: '663983832', lang: 'zh-TW' },
+    { name: '台湾華語会話', gid: '7666722', lang: 'zh-TW' }
+    // { name: '準備級一級', gid: '1241092806', lang: 'zh-TW' },
+    // { name: '準備級二級', gid: '2028056660', lang: 'zh-TW' },
+    // { name: '入門級', gid: '893410915', lang: 'zh-TW' },
+    // { name: '基礎級', gid: '41161972', lang: 'zh-TW' },
+    // { name: '進階級', gid: '375418572', lang: 'zh-TW' },
+    // { name: '高階級', gid: '1954949646', lang: 'zh-TW' },
+    // { name: '流利級', gid: '1273380145', lang: 'zh-TW' },
+    // { name: '語法點表', gid: '1856746060', lang: 'zh-TW' },
 ];
 
 // ──────────────────────────────────────────────────────────
