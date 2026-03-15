@@ -19,6 +19,7 @@ export const DEFAULT_SHEETS: SheetConfig[] = [
 
     // ── 台湾華語 ─────────────────────────────────────────
     { name: '台湾旅行', gid: '1574869365', lang: 'zh-TW' },
+    { name: '台湾Menu', gid: '663983832', lang: 'zh-TW' },
     { name: '準備級一級', gid: '1241092806', lang: 'zh-TW' },
     { name: '準備級二級', gid: '2028056660', lang: 'zh-TW' },
     { name: '入門級', gid: '893410915', lang: 'zh-TW' },
