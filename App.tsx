@@ -78,7 +78,7 @@ const App: React.FC = () => {
     [essaySheets, essayLang]
   );
 
-  const { data: fetchedEssays, isLoading: isEssayLoading } = useQuery<EssayItem[]>({
+  const { data: fetchedEssays, isLoading: isEssayLoading, refetch: refetchEssays } = useQuery<EssayItem[]>({
     queryKey: ['essay-data-v3', state.spreadsheetId, currentEssayGid],
     queryFn: () => fetchEssays(state.spreadsheetId, currentEssayGid),
     enabled: !!state.spreadsheetId && !!currentEssayGid && state.viewMode === 'essay',
@@ -176,8 +176,14 @@ const App: React.FC = () => {
       currentSheetGid: DEFAULT_SHEETS[0]?.gid || '0',
       currentIndex: 0,
     }));
+    // 単語・エッセイ両方のキャッシュを削除してリフレッシュ
     queryClient.removeQueries({ queryKey: ['spreadsheet-words'] });
-    await refetch();
+    queryClient.removeQueries({ queryKey: ['essay-data-v3'] });
+    if (state.viewMode === 'essay') {
+      await refetchEssays();
+    } else {
+      await refetch();
+    }
     setTimeout(() => setIsRefreshing(false), 800);
   };
 
