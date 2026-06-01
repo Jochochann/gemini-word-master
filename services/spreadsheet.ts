@@ -60,7 +60,7 @@ interface GvizResponse {
  * 列構成: A=タイトル, B=エッセイ本文, C=ピンイン, D=日本語訳, E=言語
  * gviz JSON は改行・引用符を安全に処理するため CSV より確実
  */
-export const fetchEssays = async (id: string, gid: string): Promise<EssayItem[]> => {
+export const fetchEssays = async (id: string, gid: string, defaultLang: string = 'zh-TW'): Promise<EssayItem[]> => {
     if (!id) return [];
     // tqx=out:json で JSON 形式を要求（CSV より多行セルに強い）
     const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&gid=${gid || '0'}`;
@@ -126,7 +126,7 @@ export const fetchEssays = async (id: string, gid: string): Promise<EssayItem[]>
                 pinyin: getVal(2) || undefined,
                 translation: getVal(3),
                 vocabulary,
-                lang: getVal(5) || 'zh-TW',  // F列
+                lang: getVal(5) || defaultLang,  // F列
             } as EssayItem;
         })
         .filter(Boolean) as EssayItem[];
