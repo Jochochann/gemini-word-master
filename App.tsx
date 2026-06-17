@@ -1,10 +1,11 @@
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import { AppState, WordItem, ViewMode, SheetConfig } from './types.ts';
 import WordCard from './components/WordCard.tsx';
 import WordList from './components/WordList.tsx';
 import WordAssistant from './components/WordAssistant.tsx';
 import EssayReader from './components/EssayReader.tsx';
+import HomeScreen from './components/HomeScreen.tsx';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchSpreadsheetWords, extractId, DEFAULT_SHEETS, DEFAULT_SHEET_ID, fetchEssays, DEFAULT_ESSAY_SHEETS } from './services/spreadsheet';
 import { EssayItem } from './types.ts';
@@ -32,10 +33,46 @@ import {
   Star,
   ArrowUpToLine,
   GraduationCap,
-  BookText
+  BookText,
+  Home
 } from 'lucide-react';
 
+const BusinessResultApp = lazy(() => import('./components/business-result/BusinessResultApp'));
+const TaiwaneseMandarinApp = lazy(() => import('./components/taiwanese-mandarin/TaiwaneseMandarinApp'));
+
+type ActiveApp = 'home' | 'word-master' | 'business' | 'taiwanese'
+
 const App: React.FC = () => {
+  const [activeApp, setActiveApp] = useState<ActiveApp>('home')
+
+  if (activeApp === 'home') {
+    return (
+      <HomeScreen
+        onSelect={(app) => setActiveApp(app === 'word-master' ? 'word-master' : app === 'business' ? 'business' : 'taiwanese')}
+      />
+    )
+  }
+
+  if (activeApp === 'business') {
+    return (
+      <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-slate-950 text-slate-100"><Loader2 className="animate-spin" size={32} /></div>}>
+        <BusinessResultApp onBack={() => setActiveApp('home')} />
+      </Suspense>
+    )
+  }
+
+  if (activeApp === 'taiwanese') {
+    return (
+      <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-slate-950 text-slate-100"><Loader2 className="animate-spin" size={32} /></div>}>
+        <TaiwaneseMandarinApp onBack={() => setActiveApp('home')} />
+      </Suspense>
+    )
+  }
+
+  return <WordMasterApp onGoHome={() => setActiveApp('home')} />
+}
+
+const WordMasterApp: React.FC<{ onGoHome: () => void }> = ({ onGoHome }) => {
   const queryClient = useQueryClient();
   const [state, setState] = useState<AppState>({
     currentIndex: 0,
@@ -232,12 +269,17 @@ const App: React.FC = () => {
       <aside className={`fixed inset-y-0 left-0 z-50 bg-slate-900 border-r border-slate-800 transition-transform duration-300 flex flex-col w-72 lg:relative lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 flex items-center justify-between border-b border-slate-800/50 flex-shrink-0">
           <div className="flex items-center space-x-2.5 group">
-            <img
-              src="/logo.png"
-              alt="Word Master Logo"
-              className="w-10 h-10 rounded-full shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform object-cover"
-            />
-            <h1 className="font-bold text-lg text-slate-100 tracking-tight">Word Master</h1>
+            <button onClick={onGoHome} className="p-1 rounded-full hover:bg-slate-800 transition-colors" title="ホームへ">
+              <img
+                src="/logo.png"
+                alt="Word Master Logo"
+                className="w-10 h-10 rounded-full shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform object-cover"
+              />
+            </button>
+            <div>
+              <h1 className="font-bold text-lg text-slate-100 tracking-tight leading-none">Word Master</h1>
+              <button onClick={onGoHome} className="text-[10px] text-slate-500 hover:text-indigo-400 transition-colors flex items-center gap-1 mt-0.5"><Home size={10} />ホーム</button>
+            </div>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="p-1.5 hover:bg-slate-800 rounded-lg lg:hidden text-slate-400 hover:text-white"><X size={20} /></button>
         </div>

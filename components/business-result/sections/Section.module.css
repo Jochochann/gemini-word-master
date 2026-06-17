@@ -1,0 +1,190 @@
+.card {
+  background: var(--color-surface);
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.cardTitle {
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  font-size: 15px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--radius-md);
+  background: var(--color-green-light);
+  color: var(--color-green-dark);
+  white-space: nowrap;
+}
+
+/* Toggle */
+.toggleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.toggleLabel {
+  font-size: 17px;
+  color: var(--color-text-muted);
+}
+
+.toggleBtn {
+  padding: 6px 14px;
+  font-size: 16px;
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.toggleBtn:hover { background: var(--color-surface-2); color: var(--color-text); }
+.toggleOn { background: var(--color-green) !important; color: #fff !important; border-color: var(--color-green) !important; }
+
+/* Reading */
+.paraBlock { margin-bottom: 1.25rem; }
+.paraHeader { display: flex; align-items: flex-start; gap: 8px; }
+.paraHeader > button { margin-top: 3px; }
+.paraEn { font-size: 18px; line-height: 1.9; color: var(--color-text); flex: 1; }
+.paraJa {
+  font-size: 17px;
+  line-height: 1.9;
+  color: var(--color-text-muted);
+  margin-top: 6px;
+  padding: 8px 12px;
+  background: var(--color-surface-2);
+  border-left: 3px solid var(--color-green);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+.highlight {
+  background: var(--color-green-light);
+  color: var(--color-green-darker);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-style: normal;
+}
+
+/* Email */
+.emailPlayRow { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.emailBox {
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  font-size: 17px;
+  line-height: 1.8;
+  color: var(--color-text);
+}
+.emailMeta { margin-bottom: 10px; }
+.emailMetaLabel { color: var(--color-text-muted); }
+.emailDivider { border: none; border-top: 0.5px solid var(--color-border); margin: 10px 0; }
+.emailBody { white-space: pre-line; }
+.emailJa { font-size: 16px; color: var(--color-text-muted); white-space: pre-line; }
+
+/* Vocab */
+.vocabGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+@media (max-width: 600px) { .vocabGrid { grid-template-columns: repeat(2, 1fr); } }
+
+.vocabItem {
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.vocabItem:hover { border-color: var(--color-border-hover); background: var(--color-surface-2); }
+.vocabFlipped { background: var(--color-green-light) !important; border-color: var(--color-green) !important; }
+.vocabTop { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; }
+.vocabWord { font-size: 17px; font-weight: 500; color: var(--color-text); flex: 1; }
+.vocabHint { font-size: 15px; color: var(--color-text-hint); margin-top: 4px; display: block; }
+.vocabJa { font-size: 16px; color: var(--color-green-dark); margin-top: 3px; font-weight: 500; }
+.vocabDef { font-size: 16px; color: var(--color-green-darker); margin-top: 5px; line-height: 1.5; }
+.vocabDefJa { font-size: 16px; color: var(--color-green-dark); margin-top: 3px; line-height: 1.5; }
+
+/* Expressions */
+.exprGroup { margin-bottom: 1rem; }
+.exprGroupTitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.exprList { display: flex; flex-direction: column; gap: 6px; }
+.exprItem {
+  padding: 10px 12px 8px;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--color-green);
+}
+.exprTop { display: flex; align-items: center; gap: 8px; }
+.exprText { flex: 1; font-size: 17px; line-height: 1.6; color: var(--color-text); }
+.exprTag { font-size: 15px; color: var(--color-text-muted); margin-left: 4px; }
+.exprJa { font-size: 16px; color: var(--color-text-muted); margin-top: 4px; }
+
+/* Grammar */
+.grammarRow { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+@media (max-width: 600px) { .grammarRow { grid-template-columns: 1fr; } }
+
+.grammarBox {
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+.grammarBoxTitle { font-size: 18px; font-weight: 500; margin-bottom: 8px; color: var(--color-text); }
+.grammarColLabel { font-size: 16px; font-weight: 500; color: var(--color-text-muted); margin-bottom: 6px; }
+.grammarList { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.grammarLi {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--color-surface);
+  border-radius: 4px;
+  border: 0.5px solid var(--color-border);
+}
+.gramLiText { flex: 1; }
+.gramEn { font-size: 16px; color: var(--color-green-dark); display: block; line-height: 1.5; }
+.gramJa { font-size: 15px; color: var(--color-text-muted); display: block; margin-top: 2px; }
+
+/* Tip */
+.tipBox {
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-top: 1rem;
+}
+.tipTitle { font-size: 16px; font-weight: 500; color: var(--color-text-muted); margin-bottom: 8px; }
+.tipBody { font-size: 17px; color: var(--color-text); line-height: 1.7; margin-bottom: 4px; }
+.tipExampleRow { display: flex; align-items: center; gap: 6px; }
+.tipExample { font-size: 17px; color: var(--color-green-dark); }
+
+/* Buttons */
+.btn {
+  padding: 10px 20px;
+  font-size: 17px;
+  border: 0.5px solid var(--color-border-hover);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: transparent;
+  color: var(--color-text);
+  transition: background 0.15s;
+}
+.btn:hover { background: var(--color-surface-2); }
+.btnPrimary { background: var(--color-green); color: #fff; border-color: var(--color-green); }
+.btnPrimary:hover { background: var(--color-green-dark); }

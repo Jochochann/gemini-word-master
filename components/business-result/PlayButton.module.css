@@ -1,0 +1,40 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 0.5px solid var(--color-border);
+  background: var(--color-surface-2);
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.btn i {
+  font-size: 14px;
+}
+
+.btn:hover {
+  background: var(--color-green-light);
+  border-color: var(--color-green);
+  color: var(--color-green-dark);
+}
+
+.btn.playing {
+  background: var(--color-green);
+  border-color: var(--color-green);
+  color: #fff;
+}
+
+.small {
+  width: 24px;
+  height: 24px;
+  background: var(--color-surface);
+}
+
+.small i {
+  font-size: 12px;
+}

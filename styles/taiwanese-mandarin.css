@@ -1,0 +1,723 @@
+/* Taiwanese Mandarin app scoped styles — all vars/base styles under .tw-root */
+.tw-root {
+  --primary: #c0392b;
+  --primary-light: #e74c3c;
+  --primary-dark: #962d22;
+  --accent: #f39c12;
+  --bg: #fdf6f0;
+  --surface: #ffffff;
+  --surface-alt: #fef9f5;
+  --text: #2c1810;
+  --text-secondary: #7f5a4a;
+  --border: #e8d5c4;
+  --shadow: 0 2px 12px rgba(192, 57, 43, 0.1);
+  --radius: 12px;
+
+  font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.tw-root * {
+  box-sizing: border-box;
+}
+
+/* ─── Top Screen ─── */
+.tw-root .top-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.tw-root .top-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  text-align: center;
+  padding: 40px 24px 36px;
+  box-shadow: 0 4px 16px rgba(192, 57, 43, 0.3);
+}
+
+.tw-root .top-logo {
+  font-size: 52px;
+  margin-bottom: 8px;
+}
+
+.tw-root .top-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.tw-root .top-subtitle {
+  font-size: 14px;
+  opacity: 0.8;
+  letter-spacing: 1px;
+}
+
+.tw-root .top-main {
+  flex: 1;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 28px 16px 60px;
+}
+
+.tw-root .vol-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tw-root .vol-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.tw-root .vol-card.open {
+  box-shadow: 0 4px 20px rgba(192, 57, 43, 0.15);
+}
+
+.tw-root .vol-card-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.tw-root .vol-card-header:hover {
+  background: var(--surface-alt);
+}
+
+.tw-root .vol-card.open .vol-card-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+}
+
+.tw-root .vol-card-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tw-root .vol-badge {
+  font-size: 16px;
+  font-weight: 800;
+  background: var(--primary);
+  color: white;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.tw-root .vol-card.open .vol-badge {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.tw-root .vol-lesson-count {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.tw-root .vol-card.open .vol-lesson-count {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.tw-root .vol-chevron {
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: transform 0.2s;
+}
+
+.tw-root .vol-card.open .vol-chevron {
+  color: white;
+}
+
+.tw-root .lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  padding: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.tw-root .lesson-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  min-height: 64px;
+}
+
+.tw-root .lesson-btn.available {
+  border-color: var(--primary);
+  background: #fff9f8;
+}
+
+.tw-root .lesson-btn.available:hover {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(192, 57, 43, 0.25);
+}
+
+.tw-root .lesson-btn.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tw-root .lesson-num {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.tw-root .lesson-btn.available:hover .lesson-num {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.tw-root .lesson-summary {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.tw-root .lesson-btn.available:hover .lesson-summary {
+  color: white;
+}
+
+.tw-root .lesson-locked-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* ─── Lesson Header ─── */
+.tw-root .app-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.tw-root .back-btn {
+  position: absolute;
+  left: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tw-root .back-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* ─── Header ─── */
+.tw-root .app-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: 20px 24px 16px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(192, 57, 43, 0.3);
+}
+
+.tw-root .app-header .lesson-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 20px;
+  padding: 3px 14px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.tw-root .app-header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+/* ─── Tabs ─── */
+.tw-root .tab-bar {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.tw-root .tab-btn {
+  flex: 1;
+  padding: 14px 8px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.tw-root .tab-btn .tab-icon {
+  font-size: 18px;
+}
+
+.tw-root .tab-btn:hover {
+  background: var(--surface-alt);
+  color: var(--primary);
+}
+
+.tw-root .tab-btn.active {
+  color: var(--primary);
+  border-bottom: 3px solid var(--primary);
+}
+
+/* ─── Main Content ─── */
+.tw-root .main-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+}
+
+/* ─── Section Title ─── */
+.tw-root .section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── Toggle Group ─── */
+.tw-root .toggle-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.tw-root .toggle-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.tw-root .toggle-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* ─── Text Reader ─── */
+.tw-root .dialogue-part {
+  margin-bottom: 24px;
+}
+
+.tw-root .part-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--surface-alt);
+  border-left: 4px solid var(--primary);
+  padding: 6px 12px;
+  margin-bottom: 12px;
+  border-radius: 0 6px 6px 0;
+}
+
+.tw-root .dialogue-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tw-root .dialogue-block.narration {
+  background: #fffbf0;
+  border-color: #e8d48a;
+}
+
+.tw-root .block-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tw-root .inline-speaker {
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.tw-root .inline-speaker.speaker-A { color: #1e40af; }
+.tw-root .inline-speaker.speaker-B { color: #166534; }
+
+.tw-root .block-line-text {
+  flex: 1;
+  line-height: 1.8;
+}
+
+.tw-root .line-chinese {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.tw-root .line-pinyin {
+  font-size: 13px;
+  color: var(--primary);
+  font-style: italic;
+}
+
+.tw-root .line-japanese {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.tw-root .speak-btn-inline {
+  align-self: center;
+  flex-shrink: 0;
+}
+
+/* ─── Buttons ─── */
+.tw-root .progress-bar-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.tw-root .ctrl-btn {
+  padding: 10px 20px;
+  border-radius: 24px;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tw-root .ctrl-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tw-root .btn-prev {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.tw-root .btn-prev:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.tw-root .btn-next {
+  background: var(--primary);
+  color: white;
+}
+
+.tw-root .btn-next:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+
+/* ─── Vocab Nav Bar ─── */
+.tw-root .vocab-nav-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.tw-root .vocab-nav-current {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.tw-root .nav-chinese {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.tw-root .nav-pinyin {
+  font-size: 14px;
+  color: var(--primary);
+  font-style: italic;
+}
+
+.tw-root .vocab-progress-bar-wrap {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+/* ─── Vocab Table ─── */
+.tw-root .vocab-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.tw-root .vocab-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  font-size: 14px;
+}
+
+.tw-root .vocab-table thead tr {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+}
+
+.tw-root .vocab-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.tw-root .vocab-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.tw-root .vocab-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.tw-root .vocab-table tbody tr:hover {
+  background: #fff5f3;
+}
+
+.tw-root .vocab-table tbody tr.row-current {
+  background: #fef0ee;
+  border-left: 4px solid var(--primary);
+}
+
+.tw-root .vocab-table td {
+  padding: 10px 14px;
+  vertical-align: middle;
+}
+
+.tw-root .col-num {
+  color: var(--text-secondary);
+  font-size: 12px;
+  width: 36px;
+  text-align: center;
+}
+
+.tw-root .col-chinese {
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.tw-root .col-pinyin {
+  color: var(--primary);
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.tw-root .col-japanese {
+  color: var(--text-secondary);
+}
+
+.tw-root .col-speak {
+  width: 44px;
+  text-align: center;
+}
+
+/* ─── Grammar Viewer ─── */
+.tw-root .grammar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tw-root .grammar-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.tw-root .grammar-card-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  padding: 14px 18px;
+}
+
+.tw-root .grammar-num {
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.7;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.tw-root .grammar-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.tw-root .grammar-title-en {
+  font-size: 12px;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.tw-root .grammar-description {
+  padding: 14px 18px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text);
+  background: var(--surface-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.tw-root .grammar-examples {
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tw-root .grammar-example {
+  background: #fafafa;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+
+.tw-root .example-chinese {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.tw-root .example-pinyin {
+  font-size: 12px;
+  color: var(--primary);
+  font-style: italic;
+  margin-bottom: 3px;
+}
+
+.tw-root .example-japanese {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* ─── Speak Button ─── */
+.tw-root .speak-btn {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: flex-start;
+  transition: all 0.2s;
+  color: var(--text-secondary);
+}
+
+.tw-root .speak-btn:hover {
+  border-color: var(--primary);
+  background: #fff5f3;
+  color: var(--primary);
+}
+
+.tw-root .speak-btn.playing {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  animation: tw-pulse 1s ease-in-out infinite;
+}
+
+@keyframes tw-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 480px) {
+  .tw-root .app-header h1 {
+    font-size: 17px;
+  }
+  .tw-root .tab-btn {
+    font-size: 11px;
+  }
+}

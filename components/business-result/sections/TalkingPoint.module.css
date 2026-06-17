@@ -1,0 +1,95 @@
+.diagramWrap {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin: 1.25rem 0;
+  flex-wrap: wrap;
+}
+
+.diagramItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 140px;
+}
+
+.diagramLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: 2px;
+  text-align: center;
+}
+
+.diagramLabelJa {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.vennSvg {
+  width: 100%;
+  max-width: 180px;
+}
+
+.diagramDesc {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 6px;
+  text-align: center;
+}
+
+.discussionList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.discussionItem {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.discussionNum {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-green-light);
+  color: var(--color-green-dark);
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.discussionBody { flex: 1; }
+
+.discussionTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.discussionEn {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--color-text);
+  flex: 1;
+}
+
+.discussionJa {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+  padding: 6px 10px;
+  background: var(--color-surface-2);
+  border-left: 3px solid var(--color-green);
+  border-radius: 0 4px 4px 0;
+}
