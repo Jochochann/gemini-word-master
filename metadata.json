@@ -1,6 +1,6 @@
 
 {
-  "name": "Gemini Multi-Language Master",
+  "name": "Learning Hub",
   "description": "An interactive multilingual vocabulary learning app that synchronizes with Google Spreadsheets and utilizes Gemini AI for deep contextual understanding and practice in various languages including English and Taiwanese Mandarin.",
   "requestFramePermissions": [
     "microphone"

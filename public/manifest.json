@@ -1,0 +1,16 @@
+{
+  "name": "Learning Hub",
+  "short_name": "Learning Hub",
+  "description": "An interactive learning app integrating English vocabulary, Business English, and Taiwanese Mandarin with Gemini AI.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ]
+}
