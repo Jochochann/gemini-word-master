@@ -14,7 +14,6 @@ export const DEFAULT_SHEET_ID = '1Ul94nfm4HbnoIeUyElhBXC6gPOsbbU-nsDjkzoY_gPU';
 export const DEFAULT_SHEETS: SheetConfig[] = [
     // ── 英語 ─────────────────────────────────────────────
     { name: 'GoFluent', gid: '0', lang: 'en-US' },
-    { name: 'Atsueigo', gid: '420352437', lang: 'en-US' },
     { name: 'Atsu構文', gid: '1185143192', lang: 'en-US' },
 
     // ── 台湾華語 ─────────────────────────────────────────

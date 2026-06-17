@@ -5,7 +5,7 @@ export const vol3Lessons: Lesson[] = [
     id: 1,
     vol: 3,
     title: 'Lesson 1',
-    summary: '高偉立と林建国が大学の寮で新しいルームメイトとして出会います',
+    summary: '寮でのルームメイトとの出会い',
     vocabulary: [
       { chinese: '室友', pinyin: 'shìyǒu', japanese: 'ルームメイト' },
       { chinese: '電梯', pinyin: 'diàntī', japanese: 'エレベーター' },
@@ -172,7 +172,7 @@ export const vol3Lessons: Lesson[] = [
     id: 2,
     vol: 3,
     title: 'Lesson 2',
-    summary: '台湾のレストランを訪れた高偉立と林建国が、食事の注文をしながら台湾の豊かな食文化に触れるエピソードです',
+    summary: 'レストランでの食事注文と台湾の食文化',
     vocabulary: [
       { chinese: '服務生/服務員', pinyin: 'fúwùshēng / fúwùyuán', japanese: 'サービス係、ウェイター' },
       { chinese: '客滿', pinyin: 'kèmǎn', japanese: '満員、満席になる' },
@@ -321,7 +321,7 @@ export const vol3Lessons: Lesson[] = [
     id: 3,
     vol: 3,
     title: 'Lesson 3',
-    summary: 'Lesson 3の本文は2つの会話で構成されています',
+    summary: '教授のオフィスへの訪問と相談',
     vocabulary: [
       { chinese: '敲', pinyin: 'qiāo', japanese: '叩く、ノックする' },
       { chinese: '辦公室', pinyin: 'bàngōngshì', japanese: 'オフィス、事務所' },
@@ -535,7 +535,7 @@ export const vol3Lessons: Lesson[] = [
     id: 4,
     vol: 3,
     title: 'Lesson 4',
-    summary: 'Lesson 4の本文は、高偉立と李平が台湾の地理について語り合う会話です',
+    summary: '台湾の地理についての会話',
     vocabulary: [
       { chinese: '包裹', pinyin: 'bāoguǒ', japanese: '小包' },
       { chinese: '收到', pinyin: 'shōudào', japanese: '受け取る' },
@@ -685,7 +685,7 @@ export const vol3Lessons: Lesson[] = [
     id: 5,
     vol: 3,
     title: 'Lesson 5',
-    summary: 'Lesson 5の本文は、高偉立と陳台麗がバス停で話をする会話です',
+    summary: 'バス停での会話',
     vocabulary: [
       { chinese: '氣候 (qìhòu)', pinyin: 'cìhòu', japanese: '気候' },
       { chinese: '出產', pinyin: 'chūchăn', japanese: '産出する、産物' },
@@ -844,7 +844,7 @@ export const vol3Lessons: Lesson[] = [
     id: 6,
     vol: 3,
     title: 'Lesson 6',
-    summary: 'Lesson 6の本文は、試験や勉強方法をテーマにした3つの会話と1つの短文で構成されています',
+    summary: '試験と勉強方法',
     vocabulary: [
       { chinese: '考卷 (kǎojuàn)', pinyin: 'kǎojyuàn', japanese: '試験の答案用紙、テスト用紙' },
       { chinese: '翻譯', pinyin: 'fānyì', japanese: '翻訳する、通訳する、翻訳' },
@@ -1061,7 +1061,7 @@ export const vol3Lessons: Lesson[] = [
     id: 7,
     vol: 3,
     title: 'Lesson 7',
-    summary: 'Lesson 7の本文は、活動中心（アクティビティセンター）での李平、林建国、高偉立の会話で構成されています',
+    summary: 'アクティビティセンターでの会話',
     vocabulary: [
       { chinese: '活動中心', pinyin: 'huódòng zhōngxīn', japanese: '活動センター、アクティビティセンター' },
       { chinese: '活動', pinyin: 'huódòng', japanese: '活動する、運動する、活動' },
@@ -1278,7 +1278,7 @@ export const vol3Lessons: Lesson[] = [
     id: 8,
     vol: 3,
     title: 'Lesson 8',
-    summary: 'Lesson 8の本文は、偉立、美真、台麗、建國が湖のほとりで話をしている場面です',
+    summary: '湖畔での会話',
     vocabulary: [
       { chinese: '湖', pinyin: 'hú', japanese: '湖' },
       { chinese: '口香糖 (kǒuxiāngtáng)', pinyin: 'kǒusiāngtáng', japanese: 'チューインガム' },
@@ -1471,7 +1471,7 @@ export const vol3Lessons: Lesson[] = [
     id: 9,
     vol: 3,
     title: 'Lesson 9',
-    summary: 'Lesson 9の本文は、大学の園遊会（アウトドアフェア）を舞台にした会話です',
+    summary: '大学の園遊会（アウトドアフェア）',
     vocabulary: [
       { chinese: '園遊會', pinyin: 'yuányóuhuì / yuányóuhuèi', japanese: '園遊会、アウトドアフェア' },
       { chinese: '塞車', pinyin: 'sāichē', japanese: '渋滞する' },
@@ -1658,7 +1658,7 @@ export const vol3Lessons: Lesson[] = [
     id: 10,
     vol: 3,
     title: 'Lesson 10',
-    summary: 'Lesson 10の本文は選挙をテーマにした2つの会話で構成されています',
+    summary: '選挙についての会話',
     vocabulary: [
       { chinese: '抱歉', pinyin: 'bàoqiàn', japanese: '申し訳なく思う、すまなく思う' },
       { chinese: '道歉', pinyin: 'dàoqiàn', japanese: '謝る、謝罪する' },
@@ -1880,7 +1880,7 @@ export const vol3Lessons: Lesson[] = [
     id: 11,
     vol: 3,
     title: 'Lesson 11',
-    summary: 'Lesson 11の本文は2つの会話と1つの短文（電子メール）で構成されています',
+    summary: '民主化と政治についての議論',
     vocabulary: [
       { chinese: '演講廳', pinyin: 'yǎnjiǎngtīng', japanese: '講堂、講義室' },
       { chinese: '同意', pinyin: 'tóngyì', japanese: '同意する' },
@@ -2095,7 +2095,7 @@ export const vol3Lessons: Lesson[] = [
     id: 12,
     vol: 3,
     title: 'Lesson 12',
-    summary: 'Lesson 12の本文は、スポーツ観戦をテーマにした2つの会話で構成されています',
+    summary: 'スポーツ観戦',
     vocabulary: [
       { chinese: '球賽 (qiúsài)', pinyin: 'cióusài', japanese: '球技の試合、試合' },
       { chinese: '比賽', pinyin: 'bǐsài', japanese: '試合、競争する' },
@@ -2307,7 +2307,7 @@ export const vol3Lessons: Lesson[] = [
     id: 13,
     vol: 3,
     title: 'Lesson 13',
-    summary: 'Lesson 13の本文は、西洋と中華圏のさまざまな「節日（祭日・祝日）」をテーマにした会話と短文で構成されています',
+    summary: '節日（祭日・祝日）',
     vocabulary: [
       { chinese: '過節', pinyin: 'guò jié', japanese: '祭日を祝う、節句を過ごす' },
       { chinese: '反正', pinyin: 'fǎnzhèng', japanese: 'とにかく、いずれにせよ、どうせ' },
@@ -2512,7 +2512,7 @@ export const vol3Lessons: Lesson[] = [
     id: 14,
     vol: 3,
     title: 'Lesson 14',
-    summary: 'Lesson 14の本文は、「休暇の旅行計画」をテーマにした会話と短文で構成されています',
+    summary: '休暇の旅行計画',
     vocabulary: [
       { chinese: '小說', pinyin: 'xiǎoshuō', japanese: '小説' },
       { chinese: '順便', pinyin: 'shùnbiàn', japanese: 'ついでに、〜のついでに' },
