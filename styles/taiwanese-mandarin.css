@@ -1,19 +1,49 @@
 /* Taiwanese Mandarin app scoped styles — all vars/base styles under .tw-root */
 .tw-root {
-  --primary: #c0392b;
-  --primary-light: #e74c3c;
-  --primary-dark: #962d22;
-  --accent: #f39c12;
-  --bg: #fdf6f0;
-  --surface: #ffffff;
-  --surface-alt: #fef9f5;
-  --text: #2c1810;
-  --text-secondary: #7f5a4a;
-  --border: #e8d5c4;
-  --shadow: 0 2px 12px rgba(192, 57, 43, 0.1);
-  --radius: 12px;
+  /* ── MD3 token overrides: dark theme, slate base + red primary ── */
+  --md-sys-color-primary: #F87171;
+  --md-sys-color-on-primary: #450A0A;
+  --md-sys-color-primary-container: #7F1D1D;
+  --md-sys-color-on-primary-container: #FCA5A5;
+  --md-sys-color-secondary: #FCA5A5;
+  --md-sys-color-on-secondary: #450A0A;
+  --md-sys-color-secondary-container: #991B1B;
+  --md-sys-color-on-secondary-container: #FEE2E2;
+  --md-sys-color-tertiary: #FCD34D;
+  --md-sys-color-on-tertiary: #451A03;
+  --md-sys-color-tertiary-container: #78350F;
+  --md-sys-color-on-tertiary-container: #FEF3C7;
+  /* slate-950/900/800 — matching Word Master baseline */
+  --md-sys-color-background: #020617;
+  --md-sys-color-on-background: #F1F5F9;
+  --md-sys-color-surface: #0F172A;
+  --md-sys-color-surface-variant: #1E293B;
+  --md-sys-color-on-surface: #F1F5F9;
+  --md-sys-color-on-surface-variant: #94A3B8;
+  --md-sys-color-outline: rgba(255, 255, 255, 0.15);
+  --md-sys-color-outline-variant: rgba(255, 255, 255, 0.08);
 
-  font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+  /* ── Card shadow + glow helpers ── */
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+  --shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 16px rgba(248, 113, 113, 0.12);
+
+  /* ── Legacy aliases → MD3 tokens ── */
+  --primary: var(--md-sys-color-primary);
+  --primary-light: #FC8A8A;
+  --primary-dark: var(--md-sys-color-secondary);
+  --accent: var(--md-sys-color-tertiary);
+  --bg: var(--md-sys-color-background);
+  --surface: var(--md-sys-color-surface);
+  --surface-alt: var(--md-sys-color-surface-variant);
+  --text: var(--md-sys-color-on-background);
+  --text-secondary: var(--md-sys-color-on-surface-variant);
+  --border: var(--md-sys-color-outline-variant);
+  --shadow: 0 2px 12px rgba(248, 113, 113, 0.15);
+
+  /* ── MD3 shape ── */
+  --radius: var(--md-sys-shape-corner-medium);
+
+  font-family: var(--md-sys-typescale-font-family);
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -35,7 +65,7 @@
   color: white;
   text-align: center;
   padding: 40px 24px 36px;
-  box-shadow: 0 4px 16px rgba(192, 57, 43, 0.3);
+  box-shadow: 0 4px 16px rgba(248, 113, 113, 0.3);
 }
 
 .tw-root .top-logo {
@@ -74,13 +104,13 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s var(--md-sys-motion-standard);
 }
 
 .tw-root .vol-card.open {
-  box-shadow: 0 4px 20px rgba(192, 57, 43, 0.15);
+  box-shadow: var(--shadow-card-hover);
 }
 
 .tw-root .vol-card-header {
@@ -170,14 +200,14 @@
 
 .tw-root .lesson-btn.available {
   border-color: var(--primary);
-  background: #fff9f8;
+  background: var(--surface-alt);
 }
 
 .tw-root .lesson-btn.available:hover {
   background: var(--primary);
   color: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(192, 57, 43, 0.25);
+  box-shadow: 0 4px 12px rgba(248, 113, 113, 0.25);
 }
 
 .tw-root .lesson-btn.locked {
@@ -245,7 +275,7 @@
   color: white;
   padding: 20px 24px 16px;
   text-align: center;
-  box-shadow: 0 4px 16px rgba(192, 57, 43, 0.3);
+  box-shadow: 0 4px 16px rgba(248, 113, 113, 0.3);
 }
 
 .tw-root .app-header .lesson-badge {
@@ -373,7 +403,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-card);
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
@@ -381,8 +411,8 @@
 }
 
 .tw-root .dialogue-block.narration {
-  background: #fffbf0;
-  border-color: #e8d48a;
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  border-color: var(--accent);
 }
 
 .tw-root .block-line {
@@ -398,8 +428,8 @@
   flex-shrink: 0;
 }
 
-.tw-root .inline-speaker.speaker-A { color: #1e40af; }
-.tw-root .inline-speaker.speaker-B { color: #166534; }
+.tw-root .inline-speaker.speaker-A { color: #93C5FD; }
+.tw-root .inline-speaker.speaker-B { color: #86EFAC; }
 
 .tw-root .block-line-text {
   flex: 1;
@@ -481,7 +511,7 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-card);
 }
 
 .tw-root .vocab-nav-current {
@@ -517,7 +547,7 @@
   overflow-x: auto;
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-card);
 }
 
 .tw-root .vocab-table {
@@ -551,11 +581,11 @@
 }
 
 .tw-root .vocab-table tbody tr:hover {
-  background: #fff5f3;
+  background: var(--surface-alt);
 }
 
 .tw-root .vocab-table tbody tr.row-current {
-  background: #fef0ee;
+  background: color-mix(in srgb, var(--primary) 15%, var(--surface));
   border-left: 4px solid var(--primary);
 }
 
@@ -604,7 +634,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-card);
 }
 
 .tw-root .grammar-card-header {
@@ -650,7 +680,7 @@
 }
 
 .tw-root .grammar-example {
-  background: #fafafa;
+  background: var(--surface-alt);
   border: 1px solid var(--border);
   border-left: 4px solid var(--accent);
   border-radius: 8px;
@@ -696,7 +726,7 @@
 
 .tw-root .speak-btn:hover {
   border-color: var(--primary);
-  background: #fff5f3;
+  background: var(--surface-alt);
   color: var(--primary);
 }
 

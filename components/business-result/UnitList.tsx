@@ -29,10 +29,9 @@ export function UnitList({ onSelect }: Props) {
           >
             <div className={styles.cardTop}>
               <span className={styles.unitNum}>{unit.number}</span>
-              {unit.available
-                ? <span className={styles.statusBadge}>学習できます</span>
-                : <span className={`${styles.statusBadge} ${styles.comingSoon}`}>準備中</span>
-              }
+              {!unit.available && (
+                <span className={`${styles.statusBadge} ${styles.comingSoon}`}>準備中</span>
+              )}
             </div>
             <h2 className={styles.unitTitle}>{unit.title}</h2>
             <p className={styles.unitTopic}>{unit.topic}</p>

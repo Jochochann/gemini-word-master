@@ -17,7 +17,7 @@
 }
 
 .errorMsg {
-  color: #A32D2D;
+  color: var(--md-sys-color-error, #FCA5A5);
   font-size: 18px;
   text-align: center;
 }
@@ -25,7 +25,7 @@
 .header {
   background: var(--color-surface-2);
   border: 0.5px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   padding: 1rem 1.25rem;
   margin-bottom: 1.25rem;
   display: flex;
@@ -33,6 +33,7 @@
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
+  box-shadow: var(--shadow-card);
 }
 
 .headerLeft { display: flex; flex-direction: column; gap: 4px; }

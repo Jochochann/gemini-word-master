@@ -1,0 +1,183 @@
+/* =================================================================
+   Material Design 3 (Material You) — Global Design Tokens
+   Learning Hub — dark theme baseline (slate-950 palette)
+   ================================================================= */
+
+:root {
+  /* ── Color System ── */
+
+  /* Primary: Indigo (Word Master / main app) */
+  --md-sys-color-primary: #818CF8;
+  --md-sys-color-on-primary: #0C0A20;
+  --md-sys-color-primary-container: #312E81;
+  --md-sys-color-on-primary-container: #E0E7FF;
+
+  /* Secondary: Slate */
+  --md-sys-color-secondary: #94A3B8;
+  --md-sys-color-on-secondary: #020617;
+  --md-sys-color-secondary-container: #1E293B;
+  --md-sys-color-on-secondary-container: #E2E8F0;
+
+  /* Tertiary: Amber accent */
+  --md-sys-color-tertiary: #FCD34D;
+  --md-sys-color-on-tertiary: #451A03;
+  --md-sys-color-tertiary-container: #78350F;
+  --md-sys-color-on-tertiary-container: #FEF3C7;
+
+  /* Error */
+  --md-sys-color-error: #FCA5A5;
+  --md-sys-color-on-error: #450A0A;
+  --md-sys-color-error-container: #7F1D1D;
+  --md-sys-color-on-error-container: #FEE2E2;
+
+  /* Surface / Background (dark) */
+  --md-sys-color-background: #020617;
+  --md-sys-color-on-background: #F1F5F9;
+  --md-sys-color-surface: #0F172A;
+  --md-sys-color-surface-variant: #1E293B;
+  --md-sys-color-on-surface: #F1F5F9;
+  --md-sys-color-on-surface-variant: #94A3B8;
+  --md-sys-color-outline: #475569;
+  --md-sys-color-outline-variant: #334155;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-inverse-surface: #F1F5F9;
+  --md-sys-color-inverse-on-surface: #020617;
+  --md-sys-color-inverse-primary: #4338CA;
+  --md-sys-color-surface-tint: var(--md-sys-color-primary);
+
+  /* ── Shape Scale ── */
+  --md-sys-shape-corner-none: 0px;
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-full: 9999px;
+
+  /* ── Typography Scale ── */
+  --md-sys-typescale-font-family: 'Roboto', 'Noto Sans JP', 'Hiragino Sans',
+    'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+
+  --md-sys-typescale-display-large-size: 57px;
+  --md-sys-typescale-display-large-line-height: 64px;
+  --md-sys-typescale-display-large-weight: 400;
+
+  --md-sys-typescale-headline-large-size: 32px;
+  --md-sys-typescale-headline-large-line-height: 40px;
+  --md-sys-typescale-headline-large-weight: 400;
+
+  --md-sys-typescale-headline-medium-size: 28px;
+  --md-sys-typescale-headline-medium-line-height: 36px;
+  --md-sys-typescale-headline-medium-weight: 400;
+
+  --md-sys-typescale-headline-small-size: 24px;
+  --md-sys-typescale-headline-small-line-height: 32px;
+  --md-sys-typescale-headline-small-weight: 400;
+
+  --md-sys-typescale-title-large-size: 22px;
+  --md-sys-typescale-title-large-line-height: 28px;
+  --md-sys-typescale-title-large-weight: 400;
+
+  --md-sys-typescale-title-medium-size: 16px;
+  --md-sys-typescale-title-medium-line-height: 24px;
+  --md-sys-typescale-title-medium-weight: 500;
+
+  --md-sys-typescale-title-small-size: 14px;
+  --md-sys-typescale-title-small-line-height: 20px;
+  --md-sys-typescale-title-small-weight: 500;
+
+  --md-sys-typescale-body-large-size: 16px;
+  --md-sys-typescale-body-large-line-height: 24px;
+  --md-sys-typescale-body-large-weight: 400;
+
+  --md-sys-typescale-body-medium-size: 14px;
+  --md-sys-typescale-body-medium-line-height: 20px;
+  --md-sys-typescale-body-medium-weight: 400;
+
+  --md-sys-typescale-body-small-size: 12px;
+  --md-sys-typescale-body-small-line-height: 16px;
+  --md-sys-typescale-body-small-weight: 400;
+
+  --md-sys-typescale-label-large-size: 14px;
+  --md-sys-typescale-label-large-line-height: 20px;
+  --md-sys-typescale-label-large-weight: 500;
+
+  --md-sys-typescale-label-medium-size: 12px;
+  --md-sys-typescale-label-medium-line-height: 16px;
+  --md-sys-typescale-label-medium-weight: 500;
+
+  --md-sys-typescale-label-small-size: 11px;
+  --md-sys-typescale-label-small-line-height: 16px;
+  --md-sys-typescale-label-small-weight: 500;
+
+  /* ── Motion ── */
+  --md-sys-motion-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --md-sys-motion-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --md-sys-motion-standard: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-standard-decelerate: cubic-bezier(0, 0, 0, 1);
+  --md-sys-motion-standard-accelerate: cubic-bezier(0.3, 0, 1, 1);
+
+  --md-sys-duration-short1: 50ms;
+  --md-sys-duration-short2: 100ms;
+  --md-sys-duration-short3: 150ms;
+  --md-sys-duration-short4: 200ms;
+  --md-sys-duration-medium1: 250ms;
+  --md-sys-duration-medium2: 300ms;
+  --md-sys-duration-medium3: 350ms;
+  --md-sys-duration-medium4: 400ms;
+  --md-sys-duration-long1: 450ms;
+  --md-sys-duration-long2: 500ms;
+}
+
+/* ── Base ── */
+body {
+  font-family: var(--md-sys-typescale-font-family);
+  background-color: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Surface Tint Elevation Utilities ── */
+.md-surface-1 {
+  background-color: color-mix(
+    in srgb,
+    var(--md-sys-color-primary) 5%,
+    var(--md-sys-color-surface)
+  );
+}
+.md-surface-2 {
+  background-color: color-mix(
+    in srgb,
+    var(--md-sys-color-primary) 8%,
+    var(--md-sys-color-surface)
+  );
+}
+.md-surface-3 {
+  background-color: color-mix(
+    in srgb,
+    var(--md-sys-color-primary) 11%,
+    var(--md-sys-color-surface)
+  );
+}
+
+/* ── Scrollbar (token-driven) ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--md-sys-color-background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--md-sys-color-outline);
+}
+body {
+  scrollbar-color: var(--md-sys-color-outline-variant) var(--md-sys-color-background);
+  scrollbar-width: thin;
+}

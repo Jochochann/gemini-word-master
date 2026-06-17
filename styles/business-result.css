@@ -1,47 +1,55 @@
 /* Business Result app scoped styles — all vars/base styles under .br-root */
 .br-root {
-  --color-green: #1D9E75;
-  --color-green-dark: #0F6E56;
-  --color-green-darker: #085041;
-  --color-green-light: #E1F5EE;
-  --color-green-light2: #9FE1CB;
-  --color-bg: #f5f5f3;
-  --color-surface: #ffffff;
-  --color-surface-2: #f0efeb;
-  --color-border: rgba(0, 0, 0, 0.12);
-  --color-border-hover: rgba(0, 0, 0, 0.25);
-  --color-text: #1a1a18;
-  --color-text-muted: #6b6b67;
-  --color-text-hint: #9b9b96;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  /* ── MD3 token overrides: dark theme, slate base + green primary ── */
+  --md-sys-color-primary: #4dbfa3;
+  --md-sys-color-on-primary: #052e1c;
+  --md-sys-color-primary-container: #0d4a32;
+  --md-sys-color-on-primary-container: #9FE1CB;
+  --md-sys-color-secondary: #9FE1CB;
+  --md-sys-color-on-secondary: #052e1c;
+  --md-sys-color-secondary-container: #1a6b52;
+  --md-sys-color-on-secondary-container: #E1F5EE;
+  /* slate-950/900/800 — matching Word Master baseline */
+  --md-sys-color-background: #020617;
+  --md-sys-color-on-background: #F1F5F9;
+  --md-sys-color-surface: #0F172A;
+  --md-sys-color-surface-variant: #1E293B;
+  --md-sys-color-on-surface: #F1F5F9;
+  --md-sys-color-on-surface-variant: #94A3B8;
+  --md-sys-color-outline: rgba(255, 255, 255, 0.15);
+  --md-sys-color-outline-variant: rgba(255, 255, 255, 0.08);
 
-  font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
-    'Noto Sans JP', sans-serif;
-  font-size: 20px;
+  /* ── Card shadow + glow helpers ── */
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+  --shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 16px rgba(77, 191, 163, 0.12);
+
+  /* ── Legacy aliases → MD3 tokens ── */
+  --color-green: var(--md-sys-color-primary);
+  --color-green-dark: var(--md-sys-color-secondary);
+  --color-green-darker: #E2E8F0;
+  --color-green-light: var(--md-sys-color-primary-container);
+  --color-green-light2: var(--md-sys-color-secondary-container);
+  --color-bg: var(--md-sys-color-background);
+  --color-surface: var(--md-sys-color-surface);
+  --color-surface-2: var(--md-sys-color-surface-variant);
+  --color-border: var(--md-sys-color-outline-variant);
+  --color-border-hover: var(--md-sys-color-outline);
+  --color-text: var(--md-sys-color-on-background);
+  --color-text-muted: var(--md-sys-color-on-surface-variant);
+  --color-text-hint: #64748B;
+
+  /* ── MD3 shape ── */
+  --radius-md: var(--md-sys-shape-corner-small);
+  --radius-lg: var(--md-sys-shape-corner-medium);
+  --radius-xl: var(--md-sys-shape-corner-large);
+
+  font-family: var(--md-sys-typescale-font-family);
+  font-size: var(--md-sys-typescale-body-large-size);
   line-height: 1.6;
   color: var(--color-text);
   background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-}
-
-@media (prefers-color-scheme: dark) {
-  .br-root {
-    --color-bg: #1a1a18;
-    --color-surface: #242422;
-    --color-surface-2: #2e2e2c;
-    --color-border: rgba(255, 255, 255, 0.12);
-    --color-border-hover: rgba(255, 255, 255, 0.25);
-    --color-text: #f0efeb;
-    --color-text-muted: #a0a09b;
-    --color-text-hint: #6b6b67;
-    --color-green-light: #0d3d2a;
-    --color-green-light2: #1a6b52;
-    --color-green-dark: #4dbfa3;
-    --color-green-darker: #f0efeb;
-  }
 }
 
 .br-root button,

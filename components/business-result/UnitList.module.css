@@ -10,11 +10,12 @@
   justify-content: space-between;
   background: var(--color-surface-2);
   border: 0.5px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   padding: 1.25rem 1.5rem;
   margin-bottom: 1.5rem;
   gap: 1rem;
   flex-wrap: wrap;
+  box-shadow: var(--shadow-card);
 }
 
 .heroTitle {
@@ -60,16 +61,18 @@
   padding: 1rem 1.1rem;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
   display: flex;
   flex-direction: column;
   gap: 6px;
   font-family: inherit;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .available:hover {
   border-color: var(--color-green);
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
 }
 
 .available:active {

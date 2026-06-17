@@ -278,7 +278,7 @@ const WordMasterApp: React.FC<{ onGoHome: () => void }> = ({ onGoHome }) => {
             </button>
             <div>
               <h1 className="font-bold text-lg text-slate-100 tracking-tight leading-none">Word Master</h1>
-              <button onClick={onGoHome} className="text-[10px] text-slate-500 hover:text-indigo-400 transition-colors flex items-center gap-1 mt-0.5"><Home size={10} />ホーム</button>
+              <button onClick={onGoHome} className="text-xs text-slate-400 hover:text-indigo-400 hover:bg-slate-800 transition-colors flex items-center gap-1 mt-1 px-2 py-1 rounded-lg"><Home size={13} />ホームへ戻る</button>
             </div>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="p-1.5 hover:bg-slate-800 rounded-lg lg:hidden text-slate-400 hover:text-white"><X size={20} /></button>
