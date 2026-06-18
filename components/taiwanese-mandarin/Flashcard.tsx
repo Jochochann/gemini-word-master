@@ -11,21 +11,15 @@ export default function Flashcard({ vocabulary }: Props) {
   const { speak, isPlaying, supported } = useSpeechTW()
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([])
 
-  const scrollToRow = (i: number) => {
-    rowRefs.current[i]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
-  }
-
   const goNext = useCallback(() => {
     const next = Math.min(index + 1, vocabulary.length - 1)
     setIndex(next)
-    scrollToRow(next)
     speak(vocabulary[next].chinese)
   }, [index, vocabulary, speak])
 
   const goPrev = useCallback(() => {
     const prev = Math.max(index - 1, 0)
     setIndex(prev)
-    scrollToRow(prev)
     speak(vocabulary[prev].chinese)
   }, [index, vocabulary, speak])
 
