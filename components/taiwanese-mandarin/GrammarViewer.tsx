@@ -1,10 +1,13 @@
 import type { GrammarPoint } from '../../data/taiwanese-mandarin/lessons'
+import { useSpeechTW } from '../../hooks/useSpeechTW'
 
 interface Props {
   grammar: GrammarPoint[]
 }
 
 export default function GrammarViewer({ grammar }: Props) {
+  const { speak, isPlaying, supported } = useSpeechTW()
+
   return (
     <div>
       <div className="section-title">
@@ -23,7 +26,18 @@ export default function GrammarViewer({ grammar }: Props) {
             <div className="grammar-examples">
               {point.examples.map((ex, j) => (
                 <div key={j} className="grammar-example">
-                  <div className="example-chinese">{ex.chinese}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div className="example-chinese" style={{ flex: 1 }}>{ex.chinese}</div>
+                    {supported && (
+                      <button
+                        className={`speak-btn speak-btn-inline ${isPlaying(ex.chinese) ? 'playing' : ''}`}
+                        onClick={() => speak(ex.chinese)}
+                        title="発音を聞く"
+                      >
+                        {isPlaying(ex.chinese) ? '⏹' : '🔊'}
+                      </button>
+                    )}
+                  </div>
                   <div className="example-pinyin">{ex.pinyin}</div>
                   <div className="example-japanese">{ex.japanese}</div>
                 </div>
